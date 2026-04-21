@@ -159,7 +159,7 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
             </button>
 
             {lscOpen && (
-              <div className="absolute top-full left-0 mt-2 w-72 glass rounded-2xl border border-amber-500/20 shadow-2xl shadow-amber-900/20 p-2 z-50">
+              <div className="absolute top-full left-0 mt-2 w-72 menu-solid rounded-2xl border border-amber-500/20 shadow-2xl shadow-amber-900/20 p-2 z-50">
                 <div className="px-3 py-2 mb-1">
                   <div className="text-[10px] font-bold uppercase tracking-widest text-amber-400/60 mb-1">2027 Roadmap</div>
                   <div className="text-xs text-gray-400">LSC Chain — 100,000+ TPS DAG Blockchain</div>
@@ -223,7 +223,7 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
             </button>
 
             {langOpen && (
-              <div className="absolute top-full right-0 mt-2 w-44 glass rounded-2xl border border-white/[0.08] shadow-2xl p-1.5 z-50">
+              <div className="absolute top-full right-0 mt-2 w-44 menu-solid rounded-2xl border border-white/[0.08] shadow-2xl p-1.5 z-50">
                 {LANGS.map(l => (
                   <button
                     key={l.code}
@@ -282,7 +282,7 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="lg:hidden border-t border-white/[0.05] bg-[#020617]/98 px-4 py-4 flex flex-col gap-1.5">
+        <div className="lg:hidden border-t border-white/[0.05] bg-[#0b1430] px-4 py-4 flex flex-col gap-1.5 shadow-2xl">
           {navItems.map(item => (
             <Link
               key={item.key}

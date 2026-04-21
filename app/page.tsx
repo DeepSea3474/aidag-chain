@@ -522,7 +522,7 @@ export default function Home() {
                 <svg className={`w-3 h-3 transition-transform hidden sm:block ${langOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
               </button>
               {langOpen && (
-                <div className="absolute top-full right-0 mt-1 w-44 glass rounded-2xl border border-white/[0.08] shadow-2xl p-1.5 z-50 max-h-80 overflow-y-auto scrollbar-hide">
+                <div className="absolute top-full right-0 mt-1 w-44 menu-solid rounded-2xl border border-white/[0.08] shadow-2xl p-1.5 z-50 max-h-80 overflow-y-auto scrollbar-hide">
                   {LANGS.map(l => (
                     <button key={l.code}
                       onClick={() => { setLang(l.code as LangCode); setLangOpen(false); }}
