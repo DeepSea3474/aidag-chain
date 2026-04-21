@@ -52,7 +52,10 @@ export type DecisionKind =
   | 'GOVERNANCE_EXECUTED'
   | 'GOVERNANCE_REJECTED'
   | 'WHITELIST_VIOLATION'
-  | 'SNAPSHOT';
+  | 'SNAPSHOT'
+  | 'LIQUIDITY_RESERVE'
+  | 'LIQUIDITY_TRANCHE_READY'
+  | 'LIQUIDITY_POLICY';
 
 export interface Decision {
   id: string;
@@ -161,6 +164,40 @@ export interface LscSnapshot {
   lastIterationAt: number;
 }
 
+// ─── Liquidity Cell ──────────────────────────────────────────────────────────
+// Runs in parallel with development. Watches the autonomous/DAO wallet,
+// earmarks a fixed ratio for DEX liquidity seeding, tracks cumulative reserve
+// and flags when a tranche is ready for deployment. Pre-mainnet: proposes
+// tranches (founder/DAO signer executes). Post-LSC-mainnet: the on-chain
+// Liquidity Keeper contract auto-executes. Every number here is derived from
+// real BSC balance reads — no fabrication.
+export interface LiquiditySnapshot {
+  enabled: boolean;
+  mode: 'accumulate' | 'tranche_ready' | 'autonomous_execute';
+  policy: {
+    daoWalletAllocation: {
+      liquidity: number;    // fraction of DAO wallet earmarked for LP (0..1)
+      devAudit: number;     // dev ops + audit budget
+      operationalBuffer: number;
+    };
+    initialPoolTargetUsd: number;     // target LP seed size at DEX pairing
+    trancheMinBnb: number;            // minimum tranche before deployment
+    targetPairings: string[];         // DEX venues
+  };
+  reserve: {
+    daoBalanceBnb: number | null;       // live from BSC
+    earmarkedForLiquidityBnb: number | null;
+    earmarkedForLiquidityUsd: number | null;
+    cumulativeContributedUsd: number;   // lifetime total added to LP pools (real, 0 pre-deploy)
+    tranchesReady: number;              // how many trancheMinBnb slices fit now
+    nextTrancheAtBnb: number;           // threshold until next tranche "fires"
+  };
+  pools: { dex: string; pairAddress: string | null; liquidityUsd: number; volume24hUsd: number; status: 'pending' | 'live' }[];
+  lastReviewAt: number;
+  lastTrancheReadyAt: number | null;
+  note: string;
+}
+
 export interface OrchestratorState {
   startedAt: number;
   lastTickAt: number;
@@ -177,6 +214,7 @@ export interface OrchestratorState {
   cex: CexEntry[];
   dex: DexEntry[];
   lsc: LscSnapshot;
+  liquidity: LiquiditySnapshot;
   decisions: Decision[];
   queue: PendingAction[];
   executedHistory: PendingAction[];
@@ -368,6 +406,7 @@ class Orchestrator {
         genesis: calcGenesisState(),
         lastIterationAt: 0,
       },
+      liquidity: this.seedLiquidity(),
       decisions: [],
       queue: [],
       executedHistory: [],
@@ -384,6 +423,7 @@ class Orchestrator {
         { id: 'lsc_phase',          name: 'LSC Genesis Phase Tracker',  status: 'idle', lastRunAt: 0, ticks: 0, errors: 0 },
         { id: 'website_prober',     name: 'Public Website Prober',      status: 'idle', lastRunAt: 0, ticks: 0, errors: 0 },
         { id: 'governance',         name: 'Governance Executor',        status: 'idle', lastRunAt: 0, ticks: 0, errors: 0 },
+        { id: 'liquidity_cell',     name: 'Liquidity Cell (parallel)',  status: 'idle', lastRunAt: 0, ticks: 0, errors: 0 },
         { id: 'snapshot',           name: 'State Snapshot',             status: 'idle', lastRunAt: 0, ticks: 0, errors: 0 },
       ],
       websiteProbe: { ok: false, lastCheckedAt: 0, statusCode: null, note: 'henüz probe edilmedi' },
@@ -427,6 +467,101 @@ class Orchestrator {
       mk('audit', 'Public contract audit'),
       mk('liquidity_funded', 'Treasury operasyon BNB > 25 (gerçek bakiye)'),
     ]}];
+  }
+
+  private seedLiquidity(): LiquiditySnapshot {
+    return {
+      enabled: true,
+      mode: 'accumulate',
+      policy: {
+        // 40% liquidity / 40% dev+audit / 20% ops buffer of the autonomous
+        // DAO wallet. Ratios are policy-declared here; actual BNB movement
+        // is non-custodial and requires a DAO signer pre-mainnet.
+        daoWalletAllocation: { liquidity: 0.40, devAudit: 0.40, operationalBuffer: 0.20 },
+        initialPoolTargetUsd: 60_000,     // minimum LP size for DEX pairing
+        trancheMinBnb: 5,                 // accumulate at least 5 BNB before deploying a tranche
+        targetPairings: ['PancakeSwap V2 · AIDAG/BNB', 'PancakeSwap V2 · AIDAG/USDT'],
+      },
+      reserve: {
+        daoBalanceBnb: null,
+        earmarkedForLiquidityBnb: null,
+        earmarkedForLiquidityUsd: null,
+        cumulativeContributedUsd: 0,
+        tranchesReady: 0,
+        nextTrancheAtBnb: 5,
+      },
+      pools: [
+        { dex: 'PancakeSwap V2 (AIDAG/BNB)', pairAddress: null, liquidityUsd: 0, volume24hUsd: 0, status: 'pending' },
+      ],
+      lastReviewAt: 0,
+      lastTrancheReadyAt: null,
+      note: 'Pre-mainnet: Liquidity Cell accumulates reserve and proposes tranches (DAO signer broadcasts). Post-LSC-mainnet: on-chain Liquidity Keeper auto-executes via LSC smart contracts.',
+    };
+  }
+
+  // Liquidity Cell — runs every tick, cost negligible (uses already-fetched
+  // treasury balance + BNB price). Earmarks DAO BNB for LP, flags ready
+  // tranches, logs policy reviews periodically. Fully parallel with dev work.
+  private runLiquidityCell(): void {
+    const liq = this.state.liquidity;
+    if (!liq.enabled) return;
+    const daoBnb = this.state.treasury.daoBnb;
+    const bnbPrice = this.state.chain.bnbPrice;
+    if (daoBnb === null) { this.touchModule('liquidity_cell', true); return; }
+
+    const earmarkedBnb = daoBnb * liq.policy.daoWalletAllocation.liquidity;
+    const earmarkedUsd = bnbPrice !== null ? earmarkedBnb * bnbPrice : null;
+    const tranchesReady = Math.floor(earmarkedBnb / liq.policy.trancheMinBnb);
+    const remainder = earmarkedBnb - tranchesReady * liq.policy.trancheMinBnb;
+    const nextTrancheAtBnb = liq.policy.trancheMinBnb - remainder;
+
+    const wasReady = liq.reserve.tranchesReady;
+    liq.reserve.daoBalanceBnb = daoBnb;
+    liq.reserve.earmarkedForLiquidityBnb = earmarkedBnb;
+    liq.reserve.earmarkedForLiquidityUsd = earmarkedUsd;
+    liq.reserve.tranchesReady = tranchesReady;
+    liq.reserve.nextTrancheAtBnb = nextTrancheAtBnb;
+    liq.lastReviewAt = Date.now();
+
+    // Mode transition: accumulate → tranche_ready when first tranche unlocks
+    if (tranchesReady > 0 && liq.mode === 'accumulate') {
+      liq.mode = 'tranche_ready';
+      liq.lastTrancheReadyAt = Date.now();
+      this.pushDecision({
+        kind: 'LIQUIDITY_TRANCHE_READY',
+        source: 'liquidity_cell.autonomous_parallel',
+        message: `Likidite tranche #${tranchesReady} hazır — ${earmarkedBnb.toFixed(3)} BNB rezerv, ${liq.policy.trancheMinBnb} BNB tranche. DAO imzacısı PancakeSwap V2 AIDAG/BNB havuzuna seed için onaylayabilir.`,
+        mode: 'propose',
+        data: { tranchesReady, earmarkedBnb, earmarkedUsd, venue: liq.policy.targetPairings[0] },
+      });
+    } else if (tranchesReady > wasReady && tranchesReady > 0) {
+      liq.lastTrancheReadyAt = Date.now();
+      this.pushDecision({
+        kind: 'LIQUIDITY_TRANCHE_READY',
+        source: 'liquidity_cell.autonomous_parallel',
+        message: `Yeni likidite tranche biriktı — toplam ${tranchesReady} tranche hazır (${earmarkedBnb.toFixed(3)} BNB rezerv).`,
+        mode: 'propose',
+        data: { tranchesReady, earmarkedBnb, earmarkedUsd },
+      });
+    }
+
+    // Policy review every 15 ticks (~2 minutes)
+    if (this.state.ticks % 15 === 0) {
+      this.pushDecision({
+        kind: 'LIQUIDITY_RESERVE',
+        source: 'liquidity_cell.review',
+        message: `Likidite rezerv durumu — DAO cüzdan ${daoBnb.toFixed(4)} BNB · earmark ${earmarkedBnb.toFixed(4)} BNB${earmarkedUsd !== null ? ` (~$${Math.round(earmarkedUsd).toLocaleString()})` : ''} · ${tranchesReady} tranche hazır · hedef havuz $${liq.policy.initialPoolTargetUsd.toLocaleString()}`,
+        mode: 'log',
+        data: { daoBnb, earmarkedBnb, earmarkedUsd, tranchesReady, mode: liq.mode },
+      });
+    }
+
+    this.touchModule('liquidity_cell');
+  }
+
+  // Public accessors for the Liquidity Cell
+  getLiquidityStatus(): LiquiditySnapshot {
+    return this.state.liquidity;
   }
 
   // ─── Lifecycle ─────────────────────────────────────────────────────────────
@@ -474,6 +609,7 @@ class Orchestrator {
         cex: prev.cex ?? this.state.cex,
         dex: prev.dex ?? this.state.dex,
         lsc: { ...this.state.lsc, ...(prev.lsc ?? {}), genesis: calcGenesisState() },
+        liquidity: prev.liquidity ?? this.state.liquidity,
         decisions: prev.decisions ?? [],
         queue: prev.queue ?? [],
         executedHistory: prev.executedHistory ?? [],
@@ -509,6 +645,7 @@ class Orchestrator {
         cex: this.state.cex,
         dex: this.state.dex,
         lsc: this.state.lsc,
+        liquidity: this.state.liquidity,
         decisions: this.state.decisions.slice(0, 50),
         queue: this.state.queue,
         executedHistory: this.state.executedHistory.slice(0, 30),
@@ -543,6 +680,7 @@ class Orchestrator {
 
       this.computePresaleFromChain();      // REAL on-chain holder & buyer derived
       this.runLscIteration();              // REAL DAG simulation (every tick)
+      this.runLiquidityCell();             // parallel autonomous liquidity formation
       this.runRules();                     // rules over real signals only
 
       if (this.state.ticks % WEBSITE_PROBE_EVERY_TICKS === 0) {

@@ -187,6 +187,13 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
                     <div className="text-xs text-gray-500">DAG architecture · consensus</div>
                   </div>
                 </Link>
+                <Link href="/budget" onClick={() => setLscOpen(false)} className="flex items-start gap-3 px-3 py-2.5 rounded-xl hover:bg-amber-500/10 transition-all group">
+                  <div className="w-8 h-8 rounded-lg bg-violet-500/20 flex items-center justify-center text-violet-400 text-base mt-0.5 shrink-0">◈</div>
+                  <div>
+                    <div className="text-sm font-semibold text-white group-hover:text-amber-400 transition-colors">Finans Şeffaflığı</div>
+                    <div className="text-xs text-gray-500">Canlı bütçe · paralel likidite</div>
+                  </div>
+                </Link>
                 <div className="mt-2 mx-3 mb-1 p-2 rounded-xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20">
                   <div className="text-[10px] text-amber-400 font-bold">⚡ AIDAG holders → priority LSC allocation @ 1:100</div>
                 </div>

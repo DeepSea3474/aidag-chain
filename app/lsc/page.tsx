@@ -62,12 +62,12 @@ const MILESTONES: Milestone[] = [
   },
   {
     phase: 'Phase 3',
-    title: 'CEX Listings & Bridge',
+    title: 'CEX Listings & Bridge + Liquidity Cell',
     date: 'Q3–Q4 2026',
     status: 'upcoming',
     pct: 8,
     items: [
-      'Tier-2 CEX listings (post-presale)',
+      'DEX listing — PancakeSwap AIDAG/BNB (Liquidity Cell seeds LP, parallel track)',
       'ETH & Polygon bridge deployment',
       'SoulwareAI v3.0 — autonomous governor',
       'DAO treasury on-chain voting',
@@ -75,27 +75,29 @@ const MILESTONES: Milestone[] = [
   },
   {
     phase: 'Phase 4',
-    title: 'LSC Chain Testnet',
-    date: 'Q1–Q3 2027',
+    title: 'LSC Chain Testnet (forked + adapted)',
+    date: 'Q3 2026 – Q1 2027',
     status: 'upcoming',
     pct: 0,
     items: [
-      'DAG consensus engine public testnet',
-      'Quantum-resistant key scheme (CRYSTALS-Dilithium)',
-      'Validator node network (250 nodes)',
-      '10,000+ TPS live benchmark',
+      'Fork proven DAG codebase (Kaspa / BlockDAG) — adapt branding & tokenomics',
+      'Single comprehensive audit (CertiK or Hacken)',
+      'Validator node network bootstrap',
+      'Public bug bounty via Immunefi',
+      'Liquidity accumulation continues in parallel',
     ],
   },
   {
     phase: 'Phase 5',
     title: 'LSC Mainnet — Full Autonomous',
-    date: 'Q4 2027',
+    date: 'Q1 2027',
     status: 'upcoming',
     pct: 0,
     items: [
       '100,000+ TPS production capacity',
       'SoulwareAI 100% on-chain autonomous',
-      'LSC Coin listed on major CEXs',
+      'AIDAG → LSC bridge opens (1 AIDAG = 100 LSC)',
+      'Liquidity Keeper contract goes live — autonomous LP management',
       'Complete founder key burn ceremony',
     ],
   },
@@ -953,7 +955,7 @@ export default function LSCPage() {
           {activeTab === 'roadmap' && (
             <div className="space-y-6" id="roadmap">
               <div>
-                <h2 className="text-2xl font-black">Roadmap 2025 → 2027</h2>
+                <h2 className="text-2xl font-black">Roadmap 2025 → Q1 2027</h2>
                 <p className="text-gray-500 text-sm mt-1">Full autonomous blockchain — governed by SoulwareAI from day one</p>
               </div>
 
@@ -1066,7 +1068,7 @@ export default function LSCPage() {
                 },
                 {
                   title: '6. AIDAG → LSC Genesis Bridge',
-                  content: 'AIDAG token holders on BSC automatically receive LSC coins at a fixed genesis ratio of 1 AIDAG = 100 LSC at mainnet launch (Q4 2027). This ratio is permanently locked — set by SoulwareAI Core Brain on Day 1 of genesis (2026-04-17) and immutable. Total AIDAG supply: 21,000,000 × 100 = 2,100,000,000 LSC total supply. The bridge is trustless and autonomous: SoulwareAI Bridge Cell verifies BSC AIDAG balances via zkProof and mints corresponding LSC coins on mainnet launch day. No manual claim required — AIDAG holders simply hold and receive.'
+                  content: 'AIDAG token holders on BSC automatically receive LSC coins at a fixed genesis ratio of 1 AIDAG = 100 LSC at mainnet launch (Q1 2027). This ratio is permanently locked — set by SoulwareAI Core Brain on Day 1 of genesis (2026-04-17) and immutable. Total AIDAG supply: 21,000,000 × 100 = 2,100,000,000 LSC total supply. The bridge is trustless and autonomous: SoulwareAI Bridge Cell verifies BSC AIDAG balances via zkProof and mints corresponding LSC coins on mainnet launch day. No manual claim required — AIDAG holders simply hold and receive.'
                 },
               ].map((section, i) => (
                 <div key={i} className="glass rounded-2xl border border-white/[0.06] p-6">
@@ -1215,7 +1217,7 @@ function LedgerExplorerTab() {
             <h2 className="text-2xl font-black mb-1">LSC Chain — Pre-Genesis Testnet Ledger</h2>
             <p className="text-sm text-gray-400 max-w-2xl">
               SoulwareAI tarafından canlı üretilen DAG zinciri. Her vertex gerçek bir hash, parent referansları ve
-              weight-tabanlı onay mekaniğine sahiptir. Bu zincirin son snapshot&apos;ı <span className="text-amber-400 font-semibold">2027 Q4 mainnet genesis</span>&apos;ine
+              weight-tabanlı onay mekaniğine sahiptir. Bu zincirin son snapshot&apos;ı <span className="text-amber-400 font-semibold">Q1 2027 mainnet genesis</span>&apos;ine
               aynen aktarılacaktır — AIDAG sahipleri aldıkları 100 LSC/AIDAG&apos;i bu kayıttan alacaktır.
             </p>
           </div>

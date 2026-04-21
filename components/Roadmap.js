@@ -66,7 +66,7 @@ export default function Roadmap({ id = "roadmap" }) {
     },
     {
       phase: "PHASE 5",
-      title: "Own DAG Chain (2027)",
+      title: "Own DAG Chain (Q1 2027)",
       status: "upcoming",
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{filter: 'drop-shadow(0 0 4px rgba(107, 114, 128, 0.5))'}}>

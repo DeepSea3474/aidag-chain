@@ -344,7 +344,7 @@ const FAQS = [
   },
   {
     q: 'How does the AIDAG ↔ LSC ecosystem work?',
-    a: 'AIDAG Token runs on BSC as the economic layer. SoulwareAI autonomously builds LSC Chain (a DAG blockchain). When LSC mainnet launches in 2027, AIDAG holders receive priority LSC coin allocation. The two tokens form a complementary autonomous loop governed by SoulwareAI modules.',
+    a: 'AIDAG Token runs on BSC as the economic layer. SoulwareAI autonomously builds LSC Chain (a DAG blockchain). When LSC mainnet launches Q1 2027, AIDAG holders receive priority LSC coin allocation. The two tokens form a complementary autonomous loop governed by SoulwareAI modules.',
   },
   {
     q: 'What is the AIDAG contract address?',
