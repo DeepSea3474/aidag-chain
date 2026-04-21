@@ -240,6 +240,14 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       isConnected: true, isConnecting: false, isSigning: false,
       isSigned: !!signature, signature: signature || null, error: null,
     });
+
+    // Persist session so all pages / refreshes see the same wallet
+    try {
+      localStorage.setItem('aidag_wallet_session', JSON.stringify({
+        address, walletType: type, signature: signature || null, signed: !!signature,
+        ts: Date.now(),
+      }));
+    } catch {}
   }, [merge, requestSignature]);
 
   // ── Core connect flow ─────────────────────────────────────
@@ -295,6 +303,13 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
   // ── Disconnect ────────────────────────────────────────────
   const disconnect = useCallback(() => {
+    try { localStorage.removeItem('aidag_wallet_session'); } catch {}
+    // Also disconnect the WalletConnect/AppKit session if any
+    try {
+      import('./web3modal').then(m => m.initWeb3Modal().then((modal: any) => {
+        if (modal && typeof modal.disconnect === 'function') modal.disconnect().catch(() => {});
+      }).catch(() => {}));
+    } catch {}
     setState({
       address: null, chainId: null, bnbBalance: null, aidagBalance: null,
       aidagBalanceRaw: 0n, isConnected: false, isConnecting: false,
@@ -323,43 +338,82 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     return txHash;
   }, [state.address]);
 
-  // ── Listen for account/chain changes ─────────────────────
+  // ── Restore persisted session + listen for account/chain changes ──
   useEffect(() => {
     if (typeof window === 'undefined') return;
+
+    let saved: any = null;
+    try {
+      const raw = localStorage.getItem('aidag_wallet_session');
+      if (raw) saved = JSON.parse(raw);
+    } catch {}
+
+    // Optimistic UI: paint connected state immediately from storage so
+    // navigating to other pages doesn't show "Connect Wallet" again.
+    if (saved && saved.address) {
+      merge({
+        address: saved.address,
+        chainId: BSC_CHAIN_ID,
+        walletType: saved.walletType ?? 'injected',
+        isConnected: true,
+        isSigned: !!saved.signed,
+        signature: saved.signature ?? null,
+      });
+      // Refresh balances in the background
+      Promise.all([
+        fetchBnbBalance(saved.address),
+        fetchAidagBalance(saved.address),
+        fetchAidagBalanceRaw(saved.address),
+      ]).then(([bnb, aidag, raw]) => {
+        merge({ bnbBalance: bnb, aidagBalance: aidag, aidagBalanceRaw: raw });
+      }).catch(() => {});
+    }
+
     const eth = (window as any).ethereum;
-    if (!eth) return;
+    if (eth) {
+      const onAccounts = (accounts: string[]) => {
+        if (!accounts.length) disconnect();
+        else {
+          const addr = accounts[0].toLowerCase();
+          merge({ address: addr });
+          try {
+            const cur = localStorage.getItem('aidag_wallet_session');
+            const obj = cur ? JSON.parse(cur) : {};
+            localStorage.setItem('aidag_wallet_session', JSON.stringify({ ...obj, address: addr }));
+          } catch {}
+        }
+      };
+      const onChain = (chainId: string) => merge({ chainId: parseInt(chainId, 16) });
+      eth.on('accountsChanged', onAccounts);
+      eth.on('chainChanged', onChain);
 
-    const onAccounts = (accounts: string[]) => {
-      if (!accounts.length) disconnect();
-      else merge({ address: accounts[0].toLowerCase() });
-    };
-    const onChain = (chainId: string) => {
-      merge({ chainId: parseInt(chainId, 16) });
-    };
-
-    eth.on('accountsChanged', onAccounts);
-    eth.on('chainChanged', onChain);
-
-    // Auto-detect if already connected (no popup)
-    eth.request({ method: 'eth_accounts' }).then((accs: string[]) => {
-      if (accs.length && state.address === null) {
-        // Already had a session — re-hydrate silently (no signature needed)
-        const addr = accs[0].toLowerCase();
-        Promise.all([fetchBnbBalance(addr), fetchAidagBalance(addr), fetchAidagBalanceRaw(addr)])
-          .then(([bnb, aidag, raw]) => {
-            merge({
-              address: addr, chainId: BSC_CHAIN_ID,
-              bnbBalance: bnb, aidagBalance: aidag, aidagBalanceRaw: raw,
-              isConnected: true, isSigned: false,
-            });
-          });
+      // If extension is unlocked & already authorized, sync silently
+      if (!saved) {
+        eth.request({ method: 'eth_accounts' }).then((accs: string[]) => {
+          if (accs.length) {
+            const addr = accs[0].toLowerCase();
+            Promise.all([fetchBnbBalance(addr), fetchAidagBalance(addr), fetchAidagBalanceRaw(addr)])
+              .then(([bnb, aidag, raw]) => {
+                merge({
+                  address: addr, chainId: BSC_CHAIN_ID,
+                  bnbBalance: bnb, aidagBalance: aidag, aidagBalanceRaw: raw,
+                  isConnected: true, isSigned: false,
+                });
+                try {
+                  localStorage.setItem('aidag_wallet_session', JSON.stringify({
+                    address: addr, walletType: 'injected', signed: false, signature: null, ts: Date.now(),
+                  }));
+                } catch {}
+              });
+          }
+        }).catch(() => {});
       }
-    }).catch(() => {});
 
-    return () => {
-      eth.removeListener('accountsChanged', onAccounts);
-      eth.removeListener('chainChanged', onChain);
-    };
+      return () => {
+        eth.removeListener('accountsChanged', onAccounts);
+        eth.removeListener('chainChanged', onChain);
+      };
+    }
   }, []); // eslint-disable-line
 
   const value: WalletContextValue = {

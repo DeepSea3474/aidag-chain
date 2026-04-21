@@ -43,10 +43,13 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
   const currentLang = LANGS.find(l => l.code === lang) || LANGS[0];
 
   const navItems = [
-    { label: t('nav_home'),     href: '/',         key: 'home',     icon: '◇' },
-    { label: t('nav_presale'),  href: '/presale',  key: 'presale',  icon: '◈', accent: 'green' },
-    { label: t('nav_dao'),      href: '/dao',      key: 'dao',      icon: '⬢', accent: 'purple' },
-    { label: t('nav_soulware'), href: '/soulware', key: 'soulware', icon: '◉', accent: 'cyan' },
+    { label: t('nav_home'),       href: '/',           key: 'home',     icon: '◇' },
+    { label: t('nav_presale'),    href: '/presale',    key: 'presale',  icon: '◈', accent: 'green' },
+    { label: t('nav_dao'),        href: '/dao',        key: 'dao',      icon: '⬢', accent: 'purple' },
+    { label: t('nav_soulware'),   href: '/soulware',   key: 'soulware', icon: '◉', accent: 'cyan' },
+    { label: t('lsc_dashboard'),  href: '/lsc',        key: 'lsc',      icon: '⬡', accent: 'amber' },
+    { label: 'Sovereign',         href: '/sovereign',  key: 'sovereign',icon: '◊', accent: 'rose' },
+    { label: 'Whitepaper',        href: '/whitepaper', key: 'docs',     icon: '▤', accent: 'blue' },
   ];
 
   return (
