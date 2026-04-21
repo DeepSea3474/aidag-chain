@@ -149,7 +149,7 @@ export default function BudgetPage() {
           <div className="glass rounded-2xl border border-emerald-500/20 p-5 bg-emerald-500/[0.03]">
             <div className="text-[10px] text-emerald-400 uppercase tracking-wider font-bold mb-2">Canlı Gelir (DAO cüzdanı)</div>
             <div className="text-3xl font-black font-mono text-emerald-400">{fmtBnb(r.live.daoWalletBnb, 4)}</div>
-            <div className="text-sm text-gray-400 mt-1">{fmtUsd(r.live.derivedRaisedUsd)} toplam presale (%40 dilim)</div>
+            <div className="text-sm text-gray-400 mt-1">≈ {fmtUsd(r.live.derivedRaisedUsd)} toplam presale (DAO %40 diliminden türetildi)</div>
             <div className="text-[10px] text-gray-600 mt-2 font-mono">{r.live.source}</div>
           </div>
           <div className="glass rounded-2xl border border-cyan-500/20 p-5 bg-cyan-500/[0.03]">

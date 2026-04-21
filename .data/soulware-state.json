@@ -1,13 +1,13 @@
 {
-  "ticks": 180,
+  "ticks": 185,
   "chain": {
-    "blockNumber": 93865167,
+    "blockNumber": 93865573,
     "gasPriceGwei": 0.1,
-    "bnbPrice": 632.04,
+    "bnbPrice": 631.26,
     "chainId": 56,
     "rpcInUse": "https://bsc.publicnode.com",
-    "lastReadAt": 1776790941984,
-    "reads": 180,
+    "lastReadAt": 1776791125022,
+    "reads": 185,
     "failures": 0
   },
   "treasury": {
@@ -25,7 +25,7 @@
     },
     "withinTolerance": null,
     "toleranceBp": 500,
-    "lastReadAt": 1776790943384
+    "lastReadAt": 1776791128474
   },
   "token": {
     "contract": "0xe6b06f7c63f6ac84729007ae8910010f6e721041",
@@ -33,9 +33,9 @@
     "uniqueHolders": 0,
     "holderSampleSize": 0,
     "founderOutflowTokens": 0,
-    "lastIngestBlock": 93865167,
+    "lastIngestBlock": 93865573,
     "ingestProgress": "live",
-    "lastIngestAt": 1776790945023,
+    "lastIngestAt": 1776791128695,
     "windowStartBlock": 93817432,
     "note": "chain başında — yeni transfer yok"
   },
@@ -43,16 +43,16 @@
     "stage": 1,
     "priceUsd": 0.078,
     "raisedBnb": 0.00194766359982915,
-    "raisedUsd": 1.231001301636016,
+    "raisedUsd": 1.2294821240281493,
     "tokensSoldOnChain": null,
-    "tokensSoldDerivedFromBnb": 15.782067969692513,
+    "tokensSoldDerivedFromBnb": 15.762591333694221,
     "stage1HardCap": 9000000,
     "stage2HardCap": 7999000,
-    "progressPct": 0.00017535631077436126,
+    "progressPct": 0.00017513990370771358,
     "shouldTransitionStage2": false,
     "uniqueBuyers": 0,
     "source": "bnb_inflow_derived",
-    "lastReadAt": 1776790945023
+    "lastReadAt": 1776791128695
   },
   "cex": [
     {
@@ -220,9 +220,114 @@
     }
   ],
   "lsc": {
-    "bestRealTps": 120000,
+    "bestRealTps": 40000,
     "bestFinalityMs": 0,
     "iterations": [
+      {
+        "id": 185,
+        "ts": 1776791128695,
+        "params": {
+          "burst": 30,
+          "tipsPerVertex": 2,
+          "targetVertices": 30
+        },
+        "metrics": {
+          "verticesCreated": 30,
+          "confirmed": 0,
+          "tips": 1,
+          "dagHeight": 9160,
+          "realTps": 30000,
+          "avgFinalityMs": 0,
+          "tipDiversity": 1,
+          "durationMs": 1
+        },
+        "delta": -10000,
+        "isBest": false
+      },
+      {
+        "id": 184,
+        "ts": 1776791120811,
+        "params": {
+          "burst": 40,
+          "tipsPerVertex": 1,
+          "targetVertices": 40
+        },
+        "metrics": {
+          "verticesCreated": 40,
+          "confirmed": 0,
+          "tips": 1,
+          "dagHeight": 9130,
+          "realTps": 40000,
+          "avgFinalityMs": 0,
+          "tipDiversity": 1,
+          "durationMs": 1
+        },
+        "delta": 10000,
+        "isBest": true
+      },
+      {
+        "id": 183,
+        "ts": 1776791109346,
+        "params": {
+          "burst": 30,
+          "tipsPerVertex": 1,
+          "targetVertices": 30
+        },
+        "metrics": {
+          "verticesCreated": 30,
+          "confirmed": 0,
+          "tips": 1,
+          "dagHeight": 9090,
+          "realTps": 30000,
+          "avgFinalityMs": 0,
+          "tipDiversity": 1,
+          "durationMs": 1
+        },
+        "delta": 5000,
+        "isBest": true
+      },
+      {
+        "id": 182,
+        "ts": 1776791104110,
+        "params": {
+          "burst": 25,
+          "tipsPerVertex": 3,
+          "targetVertices": 25
+        },
+        "metrics": {
+          "verticesCreated": 25,
+          "confirmed": 0,
+          "tips": 1,
+          "dagHeight": 9060,
+          "realTps": 25000,
+          "avgFinalityMs": 0,
+          "tipDiversity": 1,
+          "durationMs": 1
+        },
+        "delta": 0,
+        "isBest": false
+      },
+      {
+        "id": 181,
+        "ts": 1776791096815,
+        "params": {
+          "burst": 25,
+          "tipsPerVertex": 2,
+          "targetVertices": 25
+        },
+        "metrics": {
+          "verticesCreated": 25,
+          "confirmed": 0,
+          "tips": 1,
+          "dagHeight": 9035,
+          "realTps": 25000,
+          "avgFinalityMs": 0,
+          "tipDiversity": 1,
+          "durationMs": 1
+        },
+        "delta": 25000,
+        "isBest": true
+      },
       {
         "id": 180,
         "ts": 1776790945024,
@@ -1167,126 +1272,21 @@
         },
         "delta": -5000,
         "isBest": false
-      },
-      {
-        "id": 135,
-        "ts": 1776790467203,
-        "params": {
-          "burst": 110,
-          "tipsPerVertex": 1,
-          "targetVertices": 110
-        },
-        "metrics": {
-          "verticesCreated": 110,
-          "confirmed": 0,
-          "tips": 1,
-          "dagHeight": 3745,
-          "realTps": 110000,
-          "avgFinalityMs": 0,
-          "tipDiversity": 1,
-          "durationMs": 1
-        },
-        "delta": -10000,
-        "isBest": false
-      },
-      {
-        "id": 134,
-        "ts": 1776790458772,
-        "params": {
-          "burst": 120,
-          "tipsPerVertex": 2,
-          "targetVertices": 120
-        },
-        "metrics": {
-          "verticesCreated": 120,
-          "confirmed": 0,
-          "tips": 1,
-          "dagHeight": 3635,
-          "realTps": 120000,
-          "avgFinalityMs": 0,
-          "tipDiversity": 1,
-          "durationMs": 1
-        },
-        "delta": 0,
-        "isBest": false
-      },
-      {
-        "id": 133,
-        "ts": 1776790439087,
-        "params": {
-          "burst": 120,
-          "tipsPerVertex": 1,
-          "targetVertices": 120
-        },
-        "metrics": {
-          "verticesCreated": 120,
-          "confirmed": 0,
-          "tips": 1,
-          "dagHeight": 3515,
-          "realTps": 120000,
-          "avgFinalityMs": 0,
-          "tipDiversity": 1,
-          "durationMs": 1
-        },
-        "delta": 0,
-        "isBest": false
-      },
-      {
-        "id": 132,
-        "ts": 1776790412345,
-        "params": {
-          "burst": 120,
-          "tipsPerVertex": 1,
-          "targetVertices": 120
-        },
-        "metrics": {
-          "verticesCreated": 120,
-          "confirmed": 0,
-          "tips": 1,
-          "dagHeight": 3395,
-          "realTps": 120000,
-          "avgFinalityMs": 0,
-          "tipDiversity": 1,
-          "durationMs": 1
-        },
-        "delta": 0,
-        "isBest": false
-      },
-      {
-        "id": 131,
-        "ts": 1776790400074,
-        "params": {
-          "burst": 115,
-          "tipsPerVertex": 2,
-          "targetVertices": 115
-        },
-        "metrics": {
-          "verticesCreated": 115,
-          "confirmed": 0,
-          "tips": 1,
-          "dagHeight": 3275,
-          "realTps": 115000,
-          "avgFinalityMs": 0,
-          "tipDiversity": 1,
-          "durationMs": 1
-        },
-        "delta": -5000,
-        "isBest": false
       }
     ],
     "dagStats": {
-      "totalVertices": 9011,
-      "totalVerticesEver": 9011,
+      "totalVertices": 9161,
+      "totalVerticesEver": 9161,
       "totalConfirmedEver": 1,
       "confirmedCount": 1,
       "tipCount": 1,
-      "dagHeight": 9010,
+      "dagHeight": 9160,
       "genesisHash": "00119570ffb7856d110ff15d9bb26c0e",
       "genesisTimestamp": 1776789672542,
-      "seq": 9011,
+      "seq": 9161,
       "bestRealTps": 120000,
       "bestFinalityMs": 0,
-      "ageMs": 1272483
+      "ageMs": 1456153
     },
     "genesis": {
       "genesisDate": "2026-04-17",
@@ -1304,7 +1304,7 @@
           "durationDays": 14,
           "description": "Formal specification of LSC genesis block — supply, validator set, chain ID, genesis state",
           "color": "cyan",
-          "pct": 33.64,
+          "pct": 33.66,
           "status": "building"
         },
         {
@@ -1523,9 +1523,300 @@
         "type": "build"
       }
     },
-    "lastIterationAt": 1776790945025
+    "lastIterationAt": 1776791128695
+  },
+  "liquidity": {
+    "enabled": true,
+    "mode": "accumulate",
+    "policy": {
+      "daoWalletAllocation": {
+        "liquidity": 0.4,
+        "devAudit": 0.4,
+        "operationalBuffer": 0.2
+      },
+      "initialPoolTargetUsd": 60000,
+      "trancheMinBnb": 5,
+      "targetPairings": [
+        "PancakeSwap V2 · AIDAG/BNB",
+        "PancakeSwap V2 · AIDAG/USDT"
+      ]
+    },
+    "reserve": {
+      "daoBalanceBnb": 0,
+      "earmarkedForLiquidityBnb": 0,
+      "earmarkedForLiquidityUsd": 0,
+      "cumulativeContributedUsd": 0,
+      "tranchesReady": 0,
+      "nextTrancheAtBnb": 5
+    },
+    "pools": [
+      {
+        "dex": "PancakeSwap V2 (AIDAG/BNB)",
+        "pairAddress": null,
+        "liquidityUsd": 0,
+        "volume24hUsd": 0,
+        "status": "pending"
+      }
+    ],
+    "lastReviewAt": 1776791128696,
+    "lastTrancheReadyAt": null,
+    "note": "Pre-mainnet: Liquidity Cell accumulates reserve and proposes tranches (DAO signer broadcasts). Post-LSC-mainnet: on-chain Liquidity Keeper auto-executes via LSC smart contracts."
   },
   "decisions": [
+    {
+      "id": "D-mo8vk96f-d",
+      "ts": 1776791128695,
+      "kind": "LSC_ITERATION",
+      "source": "lsc.dag_iterator.real",
+      "message": "LSC iter #185: 30 vertex üretildi, gerçek TPS=30,000, ortalama finality=0ms, tip diversity=1, DAG height=9160",
+      "mode": "log",
+      "data": {
+        "id": 185,
+        "ts": 1776791128695,
+        "params": {
+          "burst": 30,
+          "tipsPerVertex": 2,
+          "targetVertices": 30
+        },
+        "metrics": {
+          "verticesCreated": 30,
+          "confirmed": 0,
+          "tips": 1,
+          "dagHeight": 9160,
+          "realTps": 30000,
+          "avgFinalityMs": 0,
+          "tipDiversity": 1,
+          "durationMs": 1
+        },
+        "delta": -10000,
+        "isBest": false
+      }
+    },
+    {
+      "id": "D-mo8vk6ce-c",
+      "ts": 1776791125022,
+      "kind": "CHAIN_TICK",
+      "source": "rpc.eth_blockNumber",
+      "message": "BSC blok #93,865,573 okundu — gas 0.1 Gwei, BNB $632.08",
+      "mode": "log",
+      "data": {
+        "blockNumber": 93865573,
+        "gasGwei": 0.1,
+        "bnbPrice": 632.08
+      }
+    },
+    {
+      "id": "D-mo8vk33f-b",
+      "ts": 1776791120811,
+      "kind": "PRESALE_PROGRESS",
+      "source": "presale.bnb_inflow_derived",
+      "message": "Presale Stage 1: 16 AIDAG, %0.00, $1 raised, 0 alıcı (kaynak: bnb_inflow_derived)",
+      "mode": "log",
+      "data": {
+        "stage": 1,
+        "tokensSold": 15.78306677153858,
+        "raisedUsd": 1.2310792081800093,
+        "progressPct": 0.0001753674085726509,
+        "buyers": 0,
+        "source": "bnb_inflow_derived"
+      }
+    },
+    {
+      "id": "D-mo8vk33f-a",
+      "ts": 1776791120811,
+      "kind": "LSC_ITERATION",
+      "source": "lsc.dag_iterator.real",
+      "message": "LSC iter #184: 40 vertex üretildi, gerçek TPS=40,000, ortalama finality=0ms, tip diversity=1, DAG height=9130 — yeni en iyi",
+      "mode": "log",
+      "data": {
+        "id": 184,
+        "ts": 1776791120811,
+        "params": {
+          "burst": 40,
+          "tipsPerVertex": 1,
+          "targetVertices": 40
+        },
+        "metrics": {
+          "verticesCreated": 40,
+          "confirmed": 0,
+          "tips": 1,
+          "dagHeight": 9130,
+          "realTps": 40000,
+          "avgFinalityMs": 0,
+          "tipDiversity": 1,
+          "durationMs": 1
+        },
+        "delta": 10000,
+        "isBest": true
+      }
+    },
+    {
+      "id": "D-mo8vk00u-9",
+      "ts": 1776791116830,
+      "kind": "CHAIN_TICK",
+      "source": "rpc.eth_blockNumber",
+      "message": "BSC blok #93,865,555 okundu — gas 0.1 Gwei, BNB $632.08",
+      "mode": "log",
+      "data": {
+        "blockNumber": 93865555,
+        "gasGwei": 0.1,
+        "bnbPrice": 632.08
+      }
+    },
+    {
+      "id": "D-mo8vju8y-8",
+      "ts": 1776791109346,
+      "kind": "LSC_ITERATION",
+      "source": "lsc.dag_iterator.real",
+      "message": "LSC iter #183: 30 vertex üretildi, gerçek TPS=30,000, ortalama finality=0ms, tip diversity=1, DAG height=9090 — yeni en iyi",
+      "mode": "log",
+      "data": {
+        "id": 183,
+        "ts": 1776791109346,
+        "params": {
+          "burst": 30,
+          "tipsPerVertex": 1,
+          "targetVertices": 30
+        },
+        "metrics": {
+          "verticesCreated": 30,
+          "confirmed": 0,
+          "tips": 1,
+          "dagHeight": 9090,
+          "realTps": 30000,
+          "avgFinalityMs": 0,
+          "tipDiversity": 1,
+          "durationMs": 1
+        },
+        "delta": 5000,
+        "isBest": true
+      }
+    },
+    {
+      "id": "D-mo8vjtru-7",
+      "ts": 1776791108730,
+      "kind": "CHAIN_TICK",
+      "source": "rpc.eth_blockNumber",
+      "message": "BSC blok #93,865,537 okundu — gas 0.1 Gwei, BNB $632.08",
+      "mode": "log",
+      "data": {
+        "blockNumber": 93865537,
+        "gasGwei": 0.1,
+        "bnbPrice": 632.08
+      }
+    },
+    {
+      "id": "D-mo8vjq7i-6",
+      "ts": 1776791104110,
+      "kind": "LSC_ITERATION",
+      "source": "lsc.dag_iterator.real",
+      "message": "LSC iter #182: 25 vertex üretildi, gerçek TPS=25,000, ortalama finality=0ms, tip diversity=1, DAG height=9060",
+      "mode": "log",
+      "data": {
+        "id": 182,
+        "ts": 1776791104110,
+        "params": {
+          "burst": 25,
+          "tipsPerVertex": 3,
+          "targetVertices": 25
+        },
+        "metrics": {
+          "verticesCreated": 25,
+          "confirmed": 0,
+          "tips": 1,
+          "dagHeight": 9060,
+          "realTps": 25000,
+          "avgFinalityMs": 0,
+          "tipDiversity": 1,
+          "durationMs": 1
+        },
+        "delta": 0,
+        "isBest": false
+      }
+    },
+    {
+      "id": "D-mo8vjmuk-5",
+      "ts": 1776791099756,
+      "kind": "CHAIN_TICK",
+      "source": "rpc.eth_blockNumber",
+      "message": "BSC blok #93,865,517 okundu — gas 0.1 Gwei, BNB $632.08",
+      "mode": "log",
+      "data": {
+        "blockNumber": 93865517,
+        "gasGwei": 0.1,
+        "bnbPrice": 632.08
+      }
+    },
+    {
+      "id": "D-mo8vjkkw-4",
+      "ts": 1776791096816,
+      "kind": "LSC_ITERATION",
+      "source": "lsc.dag_iterator.real",
+      "message": "LSC iter #181: 25 vertex üretildi, gerçek TPS=25,000, ortalama finality=0ms, tip diversity=1, DAG height=9035 — yeni en iyi",
+      "mode": "log",
+      "data": {
+        "id": 181,
+        "ts": 1776791096815,
+        "params": {
+          "burst": 25,
+          "tipsPerVertex": 2,
+          "targetVertices": 25
+        },
+        "metrics": {
+          "verticesCreated": 25,
+          "confirmed": 0,
+          "tips": 1,
+          "dagHeight": 9035,
+          "realTps": 25000,
+          "avgFinalityMs": 0,
+          "tipDiversity": 1,
+          "durationMs": 1
+        },
+        "delta": 25000,
+        "isBest": true
+      }
+    },
+    {
+      "id": "D-mo8vjhn7-3",
+      "ts": 1776791093011,
+      "kind": "CHAIN_TICK",
+      "source": "rpc.eth_blockNumber",
+      "message": "BSC blok #93,865,497 okundu — gas 0.1 Gwei, BNB $632.04",
+      "mode": "log",
+      "data": {
+        "blockNumber": 93865497,
+        "gasGwei": 0.1,
+        "bnbPrice": 632.04
+      }
+    },
+    {
+      "id": "D-mo8vjfmu-2",
+      "ts": 1776791090406,
+      "kind": "CHAIN_TICK",
+      "source": "orchestrator.start",
+      "message": "Otonom motor başlatıldı — mode=observer, dry_run=true, RPC=6, whitelist=5 aksiyon",
+      "mode": "log",
+      "data": {
+        "rpcs": 6,
+        "mode": "observer",
+        "dryRun": true,
+        "whitelist": [
+          "PRESALE_STAGE_TRANSITION",
+          "TREASURY_REBALANCE",
+          "DEX_PAIR_CREATE",
+          "CEX_APPLY",
+          "GAS_BATCH_EXECUTE"
+        ]
+      }
+    },
+    {
+      "id": "D-mo8vjfmj-1",
+      "ts": 1776791090395,
+      "kind": "SNAPSHOT",
+      "source": "snapshot.restore",
+      "message": "Snapshot geri yüklendi — 50 karar, 50 LSC iter, 0 holder, son ingest blok 93865167",
+      "mode": "log"
+    },
     {
       "id": "D-mo8vgbgh-6j",
       "ts": 1776790945025,
@@ -2233,260 +2524,11 @@
         "delta": 0,
         "isBest": false
       }
-    },
-    {
-      "id": "D-mo8vdfka-5i",
-      "ts": 1776790810378,
-      "kind": "CHAIN_TICK",
-      "source": "rpc.eth_blockNumber",
-      "message": "BSC blok #93,864,874 okundu — gas 0.1 Gwei, BNB $632.49",
-      "mode": "log",
-      "data": {
-        "blockNumber": 93864874,
-        "gasGwei": 0.1,
-        "bnbPrice": 632.49
-      }
-    },
-    {
-      "id": "D-mo8vdb9t-5h",
-      "ts": 1776790804817,
-      "kind": "LSC_ITERATION",
-      "source": "lsc.dag_iterator.real",
-      "message": "LSC iter #166: 115 vertex üretildi, gerçek TPS=115,000, ortalama finality=0ms, tip diversity=1, DAG height=7370",
-      "mode": "log",
-      "data": {
-        "id": 166,
-        "ts": 1776790804817,
-        "params": {
-          "burst": 115,
-          "tipsPerVertex": 1,
-          "targetVertices": 115
-        },
-        "metrics": {
-          "verticesCreated": 115,
-          "confirmed": 0,
-          "tips": 1,
-          "dagHeight": 7370,
-          "realTps": 115000,
-          "avgFinalityMs": 0,
-          "tipDiversity": 1,
-          "durationMs": 1
-        },
-        "delta": -5000,
-        "isBest": false
-      }
-    },
-    {
-      "id": "D-mo8vd9sl-5g",
-      "ts": 1776790802901,
-      "kind": "CHAIN_TICK",
-      "source": "rpc.eth_blockNumber",
-      "message": "BSC blok #93,864,857 okundu — gas 0.1 Gwei, BNB $631.89",
-      "mode": "log",
-      "data": {
-        "blockNumber": 93864857,
-        "gasGwei": 0.1,
-        "bnbPrice": 631.89
-      }
-    },
-    {
-      "id": "D-mo8vd30q-5f",
-      "ts": 1776790794122,
-      "kind": "LSC_ITERATION",
-      "source": "lsc.dag_iterator.real",
-      "message": "LSC iter #165: 110 vertex üretildi, gerçek TPS=110,000, ortalama finality=0ms, tip diversity=1, DAG height=7255",
-      "mode": "log",
-      "data": {
-        "id": 165,
-        "ts": 1776790794122,
-        "params": {
-          "burst": 110,
-          "tipsPerVertex": 1,
-          "targetVertices": 110
-        },
-        "metrics": {
-          "verticesCreated": 110,
-          "confirmed": 0,
-          "tips": 1,
-          "dagHeight": 7255,
-          "realTps": 110000,
-          "avgFinalityMs": 0,
-          "tipDiversity": 1,
-          "durationMs": 1
-        },
-        "delta": -10000,
-        "isBest": false
-      }
-    },
-    {
-      "id": "D-mo8vcwjp-5e",
-      "ts": 1776790785733,
-      "kind": "CHAIN_TICK",
-      "source": "rpc.eth_blockNumber",
-      "message": "BSC blok #93,864,820 okundu — gas 0.1 Gwei, BNB $631.72",
-      "mode": "log",
-      "data": {
-        "blockNumber": 93864820,
-        "gasGwei": 0.1,
-        "bnbPrice": 631.72
-      }
-    },
-    {
-      "id": "D-mo8vcr8k-5d",
-      "ts": 1776790778852,
-      "kind": "PRESALE_PROGRESS",
-      "source": "presale.bnb_inflow_derived",
-      "message": "Presale Stage 1: 16 AIDAG, %0.00, $1 raised, 0 alıcı (kaynak: bnb_inflow_derived)",
-      "mode": "log",
-      "data": {
-        "stage": 1,
-        "tokensSold": 15.774077554923982,
-        "raisedUsd": 1.2303780492840706,
-        "progressPct": 0.00017526752838804426,
-        "buyers": 0,
-        "source": "bnb_inflow_derived"
-      }
-    },
-    {
-      "id": "D-mo8vcr8k-5c",
-      "ts": 1776790778852,
-      "kind": "LSC_ITERATION",
-      "source": "lsc.dag_iterator.real",
-      "message": "LSC iter #164: 120 vertex üretildi, gerçek TPS=120,000, ortalama finality=0ms, tip diversity=1, DAG height=7145",
-      "mode": "log",
-      "data": {
-        "id": 164,
-        "ts": 1776790778852,
-        "params": {
-          "burst": 120,
-          "tipsPerVertex": 2,
-          "targetVertices": 120
-        },
-        "metrics": {
-          "verticesCreated": 120,
-          "confirmed": 0,
-          "tips": 1,
-          "dagHeight": 7145,
-          "realTps": 120000,
-          "avgFinalityMs": 0,
-          "tipDiversity": 1,
-          "durationMs": 1
-        },
-        "delta": 0,
-        "isBest": false
-      }
-    },
-    {
-      "id": "D-mo8vck1c-5b",
-      "ts": 1776790769520,
-      "kind": "CHAIN_TICK",
-      "source": "rpc.eth_blockNumber",
-      "message": "BSC blok #93,864,783 okundu — gas 0.1 Gwei, BNB $631.71",
-      "mode": "log",
-      "data": {
-        "blockNumber": 93864783,
-        "gasGwei": 0.1,
-        "bnbPrice": 631.71
-      }
-    },
-    {
-      "id": "D-mo8vch1o-5a",
-      "ts": 1776790765644,
-      "kind": "LSC_ITERATION",
-      "source": "lsc.dag_iterator.real",
-      "message": "LSC iter #163: 120 vertex üretildi, gerçek TPS=120,000, ortalama finality=0ms, tip diversity=1, DAG height=7025",
-      "mode": "log",
-      "data": {
-        "id": 163,
-        "ts": 1776790765643,
-        "params": {
-          "burst": 120,
-          "tipsPerVertex": 1,
-          "targetVertices": 120
-        },
-        "metrics": {
-          "verticesCreated": 120,
-          "confirmed": 0,
-          "tips": 1,
-          "dagHeight": 7025,
-          "realTps": 120000,
-          "avgFinalityMs": 0,
-          "tipDiversity": 1,
-          "durationMs": 1
-        },
-        "delta": 0,
-        "isBest": false
-      }
-    },
-    {
-      "id": "D-mo8vceqb-59",
-      "ts": 1776790762643,
-      "kind": "CHAIN_TICK",
-      "source": "rpc.eth_blockNumber",
-      "message": "BSC blok #93,864,764 okundu — gas 0.1 Gwei, BNB $631.76",
-      "mode": "log",
-      "data": {
-        "blockNumber": 93864764,
-        "gasGwei": 0.1,
-        "bnbPrice": 631.76
-      }
-    },
-    {
-      "id": "D-mo8vc99n-58",
-      "ts": 1776790755563,
-      "kind": "GAS_WINDOW",
-      "source": "rpc.gas_price",
-      "message": "Düşük gas penceresi (0.1 Gwei) — kuyruktaki batch işlemler için uygun",
-      "mode": "propose",
-      "data": {
-        "gasGwei": 0.1
-      }
-    },
-    {
-      "id": "D-mo8vc99n-57",
-      "ts": 1776790755563,
-      "kind": "LSC_ITERATION",
-      "source": "lsc.dag_iterator.real",
-      "message": "LSC iter #162: 120 vertex üretildi, gerçek TPS=120,000, ortalama finality=0ms, tip diversity=1, DAG height=6905",
-      "mode": "log",
-      "data": {
-        "id": 162,
-        "ts": 1776790755562,
-        "params": {
-          "burst": 120,
-          "tipsPerVertex": 1,
-          "targetVertices": 120
-        },
-        "metrics": {
-          "verticesCreated": 120,
-          "confirmed": 0,
-          "tips": 1,
-          "dagHeight": 6905,
-          "realTps": 120000,
-          "avgFinalityMs": 0,
-          "tipDiversity": 1,
-          "durationMs": 1
-        },
-        "delta": 0,
-        "isBest": false
-      }
-    },
-    {
-      "id": "D-mo8vc99l-56",
-      "ts": 1776790755561,
-      "kind": "HOLDER_UPDATE",
-      "source": "holder.set",
-      "message": "Gerçek holder sayısı: 0 (Transfer event recipient kümesi)",
-      "mode": "log",
-      "data": {
-        "holders": 0,
-        "totalTransfers": 0
-      }
     }
   ],
   "queue": [],
   "executedHistory": [],
-  "evolutionScore": 2079,
+  "evolutionScore": 1006,
   "websiteProbe": {
     "ok": true,
     "statusCode": 200,
