@@ -96,14 +96,13 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-transparent via-cyan-400/10 to-blue-600/20 mix-blend-overlay" />
             </div>
           </div>
-          <div className="leading-tight min-w-0">
-            <div className="font-black text-lg sm:text-xl tracking-tight flex items-baseline gap-1.5 select-none">
-              {/* AIDAG — navy/blue gradient with shimmer */}
-              <span className="aidag-brand">AIDAG</span>
-              {/* CHAIN — pure white with subtle glow */}
-              <span className="chain-brand">CHAIN</span>
+          <div className="leading-none min-w-0">
+            {/* Mobile: stack AIDAG / CHAIN vertically to save width */}
+            <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1.5 font-black tracking-tight select-none">
+              <span className="aidag-brand text-base sm:text-xl leading-none">AIDAG</span>
+              <span className="chain-brand text-[11px] sm:text-xl leading-none mt-0.5 sm:mt-0">CHAIN</span>
             </div>
-            <div className="hidden sm:flex text-[9px] text-cyan-400/70 font-bold tracking-[0.25em] uppercase items-center gap-1">
+            <div className="hidden sm:flex mt-1 text-[9px] text-cyan-400/70 font-bold tracking-[0.25em] uppercase items-center gap-1">
               <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
               SoulwareAI · Autonomous
             </div>
@@ -197,17 +196,18 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
         </div>
 
         {/* Right actions */}
-        <div className="flex items-center gap-2">
-          {/* Buy AIDAG — prominent CTA, always visible */}
+        <div className="flex items-center gap-1 sm:gap-2">
+          {/* Buy AIDAG — icon-only on tiny screens, label on tablet+ */}
           <Link
             href="/presale"
-            className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-black bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:from-emerald-400 hover:to-green-500 transition-all shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:-translate-y-0.5"
+            aria-label={t('nav_buy')}
+            className="flex items-center gap-1 px-2 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-black bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:from-emerald-400 hover:to-green-500 transition-all shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:-translate-y-0.5"
           >
             <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span className="hidden md:inline">{t('nav_buy')}</span>
-            <span className="md:hidden">{t('nav_buy_short')}</span>
+            <span className="hidden sm:inline md:hidden">{t('nav_buy_short')}</span>
             <span className="hidden lg:inline text-[9px] bg-white/20 px-1 py-0.5 rounded ml-0.5">$0.078</span>
           </Link>
 
@@ -215,7 +215,7 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
           <div className="relative" ref={langRef}>
             <button
               onClick={() => setLangOpen(!langOpen)}
-              className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/[0.05] transition-all border border-white/[0.06] hover:border-white/[0.12]"
+              className="flex items-center gap-1 px-1.5 sm:px-2.5 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/[0.05] transition-all border border-white/[0.06] hover:border-white/[0.12]"
               title={t('nav_change_lang')}
             >
               <span className="text-base leading-none">{currentLang.flag}</span>
