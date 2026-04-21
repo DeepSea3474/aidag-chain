@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { useState, useEffect, useCallback } from 'react';
 import WalletButton from '../components/WalletButton';
 import Navbar from '../components/Navbar';
+import Icon from '../components/Icon';
 import PresaleWidget from '../components/PresaleWidget';
 import LiveEcosystem from '../components/LiveEcosystem';
 import EcosystemCTA from '../components/EcosystemCTA';
@@ -401,7 +402,7 @@ export default function Home() {
     { label: 'Presale', href: '/presale' },
     { label: 'DAO', href: '/dao' },
     { label: 'SoulwareAI', href: '/soulware' },
-    { label: '💬 AI Chat', href: '/chat' },
+    { label: 'AI Chat', href: '/chat' },
     { label: 'Tokenomics', href: '#tokenomics' },
     { label: 'Roadmap', href: '#roadmap' },
     { label: '⚔', href: '/sovereign' },
@@ -487,14 +488,14 @@ export default function Home() {
               {lscOpen && (
                 <div className="absolute top-full left-0 mt-1 w-68 glass rounded-2xl border border-amber-500/20 shadow-2xl p-2 z-50 min-w-[260px]">
                   {[
-                    { href: '/lsc', icon: '⬡', label: 'LSC Dashboard', sub: 'Live DAG network & metrics' },
-                    { href: '/lsc#roadmap', icon: '🗺', label: '2027 Roadmap', sub: 'Milestone timeline' },
-                    { href: '/lsc#devlog', icon: '📡', label: 'SoulwareAI Dev Log', sub: 'Autonomous build updates' },
-                    { href: '/lsc#whitepaper', icon: '📄', label: 'Whitepaper', sub: 'Technical specification' },
+                    { href: '/lsc', icon: 'hexagon' as const, label: 'LSC Dashboard', sub: 'Live DAG network & metrics' },
+                    { href: '/lsc#roadmap', icon: 'map' as const, label: '2027 Roadmap', sub: 'Milestone timeline' },
+                    { href: '/lsc#devlog', icon: 'broadcast' as const, label: 'SoulwareAI Dev Log', sub: 'Autonomous build updates' },
+                    { href: '/lsc#whitepaper', icon: 'document' as const, label: 'Whitepaper', sub: 'Technical specification' },
                   ].map(item => (
                     <Link key={item.href} href={item.href}
                       className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-amber-500/10 group transition-all">
-                      <span className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-base flex-shrink-0">{item.icon}</span>
+                      <span className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0 text-amber-400"><Icon name={item.icon} size={16} /></span>
                       <div>
                         <div className="text-sm font-semibold text-white group-hover:text-amber-400 transition-colors">{item.label}</div>
                         <div className="text-xs text-gray-600">{item.sub}</div>
@@ -786,12 +787,12 @@ export default function Home() {
                 </p>
                 <div className="grid grid-cols-3 gap-3 mb-8">
                   {[
-                    { label: 'Target TPS', val: '100K+', icon: '⚡', c: 'text-amber-400' },
-                    { label: 'Architecture', val: 'DAG', icon: '⬡', c: 'text-cyan-400' },
-                    { label: 'Launch', val: '2027', icon: '🚀', c: 'text-purple-400' },
+                    { label: 'Target TPS', val: '100K+', icon: 'bolt' as const, c: 'text-amber-400' },
+                    { label: 'Architecture', val: 'DAG', icon: 'hexagon' as const, c: 'text-cyan-400' },
+                    { label: 'Launch', val: '2027', icon: 'rocket' as const, c: 'text-purple-400' },
                   ].map((s, i) => (
                     <div key={i} className="glass-gold rounded-xl p-3 text-center border border-amber-500/15">
-                      <div className="text-xl mb-1">{s.icon}</div>
+                      <div className={`mb-1 flex justify-center ${s.c}`}><Icon name={s.icon} size={20} /></div>
                       <div className={`font-black text-lg leading-none ${s.c}`}>{s.val}</div>
                       <div className="text-[10px] text-gray-500 mt-0.5">{s.label}</div>
                     </div>
@@ -1033,7 +1034,7 @@ export default function Home() {
                 {
                   title: 'Resources',
                   links: [
-                    { label: '💬 SoulwareAI Chat', href: '/chat', ext: false },
+                    { label: 'SoulwareAI Chat', href: '/chat', ext: false },
                     { label: 'LSC Whitepaper', href: '/lsc#whitepaper', ext: false },
                     { label: 'GitHub Repository', href: GITHUB_URL, ext: true },
                     { label: 'BSCScan Contract', href: BSCSCAN_TOKEN_URL, ext: true },

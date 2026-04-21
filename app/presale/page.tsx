@@ -7,6 +7,7 @@ import Navbar from '../../components/Navbar';
 import { useWallet } from '../../lib/useWallet';
 import { useChainData } from '../../lib/useChainData';
 import { useT } from '../../lib/LanguageContext';
+import Icon from '../../components/Icon';
 import {
   TOKEN_CONTRACT, BSCSCAN_TOKEN_URL,
   PRESALE_STAGE1_PRICE, PRESALE_STAGE2_PRICE, LISTING_PRICE,
@@ -702,21 +703,21 @@ export default function PresalePage() {
             {/* Links */}
             <div className="space-y-2">
               {[
-                { href: TELEGRAM_URL, label: 'Join Telegram Community', icon: '💬' },
-                { href: TWITTER_URL, label: 'Follow on Twitter / X', icon: '🐦' },
-                { href: GITHUB_URL, label: 'Open Source on GitHub', icon: '⚙️' },
-                { href: '/dao', label: 'DAO Governance Portal', icon: '🏛' },
-                { href: '/lsc', label: 'LSC Chain Dashboard', icon: '⬡' },
+                { href: TELEGRAM_URL, label: 'Join Telegram Community', icon: 'chat' as const },
+                { href: TWITTER_URL, label: 'Follow on Twitter / X', icon: 'twitter' as const },
+                { href: GITHUB_URL, label: 'Open Source on GitHub', icon: 'code' as const },
+                { href: '/dao', label: 'DAO Governance Portal', icon: 'governance' as const },
+                { href: '/lsc', label: 'LSC Chain Dashboard', icon: 'hexagon' as const },
               ].map(s => (
                 s.href.startsWith('http')
                   ? <a key={s.href} href={s.href} target="_blank" rel="noopener noreferrer"
                       className="flex items-center gap-3 px-4 py-3 glass rounded-xl border border-white/[0.05] hover:border-cyan-500/20 text-sm text-gray-400 hover:text-white transition-all">
-                      <span>{s.icon}</span>{s.label}
+                      <Icon name={s.icon} size={15} />{s.label}
                       <svg className="ml-auto w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                     </a>
                   : <Link key={s.href} href={s.href}
                       className="flex items-center gap-3 px-4 py-3 glass rounded-xl border border-white/[0.05] hover:border-cyan-500/20 text-sm text-gray-400 hover:text-white transition-all">
-                      <span>{s.icon}</span>{s.label}
+                      <Icon name={s.icon} size={15} />{s.label}
                     </Link>
               ))}
             </div>

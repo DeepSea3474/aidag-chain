@@ -7,6 +7,7 @@ import Navbar from '../../components/Navbar';
 import { useWallet } from '../../lib/useWallet';
 import { useChainData } from '../../lib/useChainData';
 import { useT } from '../../lib/LanguageContext';
+import Icon from '../../components/Icon';
 import { TOKEN_CONTRACT, BSCSCAN_TOKEN_URL, TELEGRAM_URL, TWITTER_URL, GITHUB_URL } from '../../lib/constants';
 
 function LiveDot({ color = 'emerald' }: { color?: string }) {
@@ -496,22 +497,22 @@ export default function DAOPage() {
               <h3 className="font-bold text-sm mb-4 text-gray-300">Quick Links</h3>
               <div className="space-y-2">
                 {[
-                  { href: '/presale', label: 'Buy AIDAG Token', icon: '💰', ext: false },
-                  { href: '/lsc', label: 'LSC Chain Dashboard', icon: '⬡', ext: false },
-                  { href: BSCSCAN_TOKEN_URL, label: 'Token on BSCScan', icon: '🔍', ext: true },
-                  { href: TELEGRAM_URL, label: 'Telegram Community', icon: '💬', ext: true },
-                  { href: TWITTER_URL, label: 'Twitter / X', icon: '🐦', ext: true },
-                  { href: GITHUB_URL, label: 'GitHub Repository', icon: '⚙️', ext: true },
+                  { href: '/presale', label: 'Buy AIDAG Token', icon: 'coin' as const, ext: false },
+                  { href: '/lsc', label: 'LSC Chain Dashboard', icon: 'hexagon' as const, ext: false },
+                  { href: BSCSCAN_TOKEN_URL, label: 'Token on BSCScan', icon: 'search' as const, ext: true },
+                  { href: TELEGRAM_URL, label: 'Telegram Community', icon: 'chat' as const, ext: true },
+                  { href: TWITTER_URL, label: 'Twitter / X', icon: 'twitter' as const, ext: true },
+                  { href: GITHUB_URL, label: 'GitHub Repository', icon: 'code' as const, ext: true },
                 ].map(s =>
                   s.ext
                     ? <a key={s.href} href={s.href} target="_blank" rel="noopener noreferrer"
                         className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.04] text-sm text-gray-400 hover:text-white transition-all">
-                        <span>{s.icon}</span>{s.label}
+                        <Icon name={s.icon} size={15} />{s.label}
                         <svg className="w-3 h-3 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                       </a>
                     : <Link key={s.href} href={s.href}
                         className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.04] text-sm text-gray-400 hover:text-white transition-all">
-                        <span>{s.icon}</span>{s.label}
+                        <Icon name={s.icon} size={15} />{s.label}
                       </Link>
                 )}
               </div>

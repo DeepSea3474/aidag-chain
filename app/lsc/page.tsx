@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Navbar from '../../components/Navbar';
 import { LSC_TOTAL_SUPPLY, AIDAG_TO_LSC_RATIO, MAX_SUPPLY } from '../../lib/constants';
 import { useT } from '../../lib/LanguageContext';
+import Icon, { IconName } from '../../components/Icon';
 import { calcGenesisState } from '../../lib/lsc-genesis-engine';
 import { soulwareAI, EngineState } from '../../lib/soulware-core';
 
@@ -182,7 +183,7 @@ function useDevLogs() {
 }
 
 /* ─── Components ─── */
-function StatCard({ label, value, unit, color = 'cyan', icon }: { label: string; value: string | number; unit?: string; color?: string; icon: string }) {
+function StatCard({ label, value, unit, color = 'cyan', icon }: { label: string; value: string | number; unit?: string; color?: string; icon: IconName }) {
   const colors: Record<string, string> = {
     cyan: 'border-cyan-500/20 from-cyan-500/10',
     gold: 'border-amber-500/20 from-amber-500/10',
@@ -198,7 +199,7 @@ function StatCard({ label, value, unit, color = 'cyan', icon }: { label: string;
   return (
     <div className={`glass rounded-2xl border ${colors[color]} bg-gradient-to-b to-transparent p-5 relative overflow-hidden`}>
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-current to-transparent opacity-20" />
-      <div className="text-2xl mb-2">{icon}</div>
+      <div className={`mb-2 ${textColors[color]}`}><Icon name={icon} size={22} strokeWidth={1.8} /></div>
       <div className={`text-2xl font-black font-mono ${textColors[color]} leading-none`}>{value}</div>
       {unit && <div className="text-xs text-gray-500 mt-0.5 font-medium">{unit}</div>}
       <div className="text-xs text-gray-500 mt-2 font-medium uppercase tracking-wider">{label}</div>
@@ -649,12 +650,12 @@ export default function LSCPage() {
 
               {/* Stats grid */}
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                <StatCard icon="⚡" label="Simulated TPS" value={stats.tps.toLocaleString()} unit="transactions/sec" color="gold" />
-                <StatCard icon="⬡" label="DAG Height" value={`#${stats.dagHeight.toLocaleString()}`} unit="testnet blocks" color="cyan" />
-                <StatCard icon="🌐" label="Active Nodes" value={stats.nodes} unit="validator nodes" color="green" />
-                <StatCard icon="⏱" label="Finality" value={`${stats.latency}ms`} unit="avg confirmation" color="blue" />
-                <StatCard icon="🔒" label="Network Load" value={`${stats.networkLoad}%`} unit="capacity used" color="purple" />
-                <StatCard icon="🤖" label="AI Uptime" value={`${stats.aiUptime.toFixed(2)}%`} unit="SoulwareAI SLA" color="rose" />
+                <StatCard icon="bolt" label="Simulated TPS" value={stats.tps.toLocaleString()} unit="transactions/sec" color="gold" />
+                <StatCard icon="hexagon" label="DAG Height" value={`#${stats.dagHeight.toLocaleString()}`} unit="testnet blocks" color="cyan" />
+                <StatCard icon="network" label="Active Nodes" value={stats.nodes} unit="validator nodes" color="green" />
+                <StatCard icon="clock" label="Finality" value={`${stats.latency}ms`} unit="avg confirmation" color="blue" />
+                <StatCard icon="shield" label="Network Load" value={`${stats.networkLoad}%`} unit="capacity used" color="purple" />
+                <StatCard icon="cpu" label="AI Uptime" value={`${stats.aiUptime.toFixed(2)}%`} unit="SoulwareAI SLA" color="rose" />
               </div>
 
               {/* DAG + SoulwareAI side by side */}
@@ -945,7 +946,7 @@ export default function LSCPage() {
                               <h3 className="font-black text-lg">{m.title}</h3>
                             </div>
                             <span className="text-2xl">
-                              {m.status === 'done' ? '✅' : m.status === 'active' ? '⚡' : '🔮'}
+                              <Icon name={m.status === 'done' ? 'check' : m.status === 'active' ? 'bolt' : 'sparkle'} size={14} strokeWidth={2} />
                             </span>
                           </div>
 

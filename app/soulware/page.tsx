@@ -11,6 +11,7 @@ import {
 } from '../../lib/soulware-engine';
 import { GITHUB_URL, TELEGRAM_URL, TOKEN_CONTRACT } from '../../lib/constants';
 import { useT } from '../../lib/LanguageContext';
+import Icon, { IconName } from '../../components/Icon';
 
 function LiveDot({ color = 'emerald', size = 'sm' }: { color?: string; size?: 'xs' | 'sm' | 'md' }) {
   const s = size === 'xs' ? 'w-1.5 h-1.5' : size === 'md' ? 'w-3 h-3' : 'w-2 h-2';
@@ -19,13 +20,13 @@ function LiveDot({ color = 'emerald', size = 'sm' }: { color?: string; size?: 'x
 }
 
 const EVENT_TYPE_META: Record<string, { icon: string; color: string; badge: string }> = {
-  DAG_NODE:  { icon: '⬡', color: 'text-cyan-400',   badge: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' },
-  DECISION:  { icon: '⚡', color: 'text-amber-400',  badge: 'bg-amber-500/10 border-amber-500/20 text-amber-400' },
-  AGENT:     { icon: '🤖', color: 'text-purple-400', badge: 'bg-purple-500/10 border-purple-500/20 text-purple-400' },
-  BRIDGE:    { icon: '🌉', color: 'text-blue-400',   badge: 'bg-blue-500/10 border-blue-500/20 text-blue-400' },
-  DAO:       { icon: '🏛', color: 'text-emerald-400',badge: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' },
-  SECURITY:  { icon: '🔐', color: 'text-rose-400',   badge: 'bg-rose-500/10 border-rose-500/20 text-rose-400' },
-  LSC_BUILD: { icon: '🔨', color: 'text-yellow-400', badge: 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' },
+  DAG_NODE:  { icon: 'hexagon' as IconName, color: 'text-cyan-400',   badge: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' },
+  DECISION:  { icon: 'bolt' as IconName,    color: 'text-amber-400',  badge: 'bg-amber-500/10 border-amber-500/20 text-amber-400' },
+  AGENT:     { icon: 'cpu' as IconName,     color: 'text-purple-400', badge: 'bg-purple-500/10 border-purple-500/20 text-purple-400' },
+  BRIDGE:    { icon: 'bridge' as IconName,  color: 'text-blue-400',   badge: 'bg-blue-500/10 border-blue-500/20 text-blue-400' },
+  DAO:       { icon: 'governance' as IconName, color: 'text-emerald-400', badge: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' },
+  SECURITY:  { icon: 'lock' as IconName,    color: 'text-rose-400',   badge: 'bg-rose-500/10 border-rose-500/20 text-rose-400' },
+  LSC_BUILD: { icon: 'hammer' as IconName,  color: 'text-yellow-400', badge: 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' },
 };
 
 const SEVERITY_BAR: Record<string, string> = {
@@ -424,7 +425,7 @@ export default function SoulwarePage() {
                   return (
                     <div key={ev.id} className={`px-4 py-3 border-l-2 ${SEVERITY_BAR[ev.severity]} transition-all`}>
                       <div className="flex items-start gap-2.5">
-                        <span className="text-base flex-shrink-0 mt-0.5">{meta.icon}</span>
+                        <span className={`flex-shrink-0 mt-0.5 ${meta.color}`}><Icon name={meta.icon} size={16} strokeWidth={1.8} /></span>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
                             <span className={`text-[9px] font-black px-2 py-0.5 rounded border ${meta.badge}`}>{ev.type.replace('_', ' ')}</span>
@@ -474,21 +475,21 @@ export default function SoulwarePage() {
             {/* Quick links */}
             <div className="space-y-2">
               {[
-                { href: '/presale', label: 'Buy AIDAG Token', icon: '💰', ext: false },
-                { href: '/dao',     label: 'DAO Governance',  icon: '🏛',  ext: false },
-                { href: '/lsc',     label: 'LSC Dashboard',   icon: '⬡',   ext: false },
-                { href: GITHUB_URL, label: 'GitHub Source',   icon: '⚙️',  ext: true },
-                { href: TELEGRAM_URL, label: 'Telegram',      icon: '💬',  ext: true },
+                { href: '/presale', label: 'Buy AIDAG Token', icon: 'coin' as IconName, ext: false },
+                { href: '/dao',     label: 'DAO Governance',  icon: 'governance' as IconName, ext: false },
+                { href: '/lsc',     label: 'LSC Dashboard',   icon: 'hexagon' as IconName, ext: false },
+                { href: GITHUB_URL, label: 'GitHub Source',   icon: 'code' as IconName, ext: true },
+                { href: TELEGRAM_URL, label: 'Telegram',      icon: 'chat' as IconName, ext: true },
               ].map(s =>
                 s.ext
                   ? <a key={s.href} href={s.href} target="_blank" rel="noopener noreferrer"
                       className="flex items-center gap-3 px-4 py-3 glass rounded-xl border border-white/[0.05] hover:border-cyan-500/20 text-sm text-gray-400 hover:text-white transition-all">
-                      <span>{s.icon}</span>{s.label}
+                      <Icon name={s.icon} size={15} />{s.label}
                       <svg className="w-3 h-3 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                     </a>
                   : <Link key={s.href} href={s.href}
                       className="flex items-center gap-3 px-4 py-3 glass rounded-xl border border-white/[0.05] hover:border-cyan-500/20 text-sm text-gray-400 hover:text-white transition-all">
-                      <span>{s.icon}</span>{s.label}
+                      <Icon name={s.icon} size={15} />{s.label}
                     </Link>
               )}
             </div>
@@ -509,7 +510,7 @@ export default function SoulwarePage() {
                 title: 'Brain Layer — Core Intelligence',
                 color: 'border-cyan-500/20',
                 glow: 'text-cyan-400',
-                icon: '🧠',
+                icon: 'brain' as IconName,
                 items: [
                   'Central autonomous decision engine',
                   'Multi-cell orchestration protocol',
@@ -522,7 +523,7 @@ export default function SoulwarePage() {
                 title: 'Cell Layer — Specialized Agents',
                 color: 'border-purple-500/20',
                 glow: 'text-purple-400',
-                icon: '⬡',
+                icon: 'hexagon' as IconName,
                 items: [
                   'DAO Cell: proposal & execution',
                   'LSC Builder Cell: DAG construction',
@@ -535,7 +536,7 @@ export default function SoulwarePage() {
                 title: 'DAG Loop — AIDAG ↔ LSC Chain',
                 color: 'border-amber-500/20',
                 glow: 'text-amber-400',
-                icon: '🔗',
+                icon: 'link' as IconName,
                 items: [
                   'AIDAG Token (BSC) as economic root',
                   'SoulwareAI constructs LSC DAG block-by-block',
@@ -546,7 +547,7 @@ export default function SoulwarePage() {
               },
             ].map((col, i) => (
               <div key={i} className={`glass rounded-2xl border ${col.color} p-6`}>
-                <div className="text-3xl mb-3">{col.icon}</div>
+                <div className={`mb-3 ${col.glow}`}><Icon name={col.icon} size={28} strokeWidth={1.6} /></div>
                 <h3 className={`font-black text-sm mb-4 ${col.glow}`}>{col.title}</h3>
                 <ul className="space-y-2">
                   {col.items.map((item, j) => (
