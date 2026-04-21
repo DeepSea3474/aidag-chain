@@ -19,6 +19,7 @@ import {
 
 const NeuralBrain = dynamic(() => import('../components/NeuralBrain'), { ssr: false });
 const DAGNetwork  = dynamic(() => import('../components/DAGNetwork'),  { ssr: false });
+const GenesisHeartbeat = dynamic(() => import('../components/GenesisHeartbeat'), { ssr: false });
 
 // ── 10-Language system ────────────────────────────────────────────────────────
 const LANGS = [
@@ -736,22 +737,24 @@ export default function Home() {
               href="/lsc"
               className="group relative rounded-3xl overflow-hidden border border-amber-500/20 bg-gradient-to-br from-amber-950/30 to-[#020617] hover:border-amber-400/50 hover:shadow-[0_0_60px_rgba(245,158,11,0.18)] transition-all"
             >
-              <div className="relative h-[260px] sm:h-[320px] md:h-[340px]">
-                <DAGNetwork />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/50 to-transparent pointer-events-none" />
+              <div className="relative h-[260px] sm:h-[320px] md:h-[340px] flex items-center justify-center p-3 sm:p-4">
+                <div className="w-full">
+                  <GenesisHeartbeat />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-transparent to-transparent pointer-events-none" />
               </div>
-              <div className="absolute top-3 left-3 flex items-center gap-2 glass-gold rounded-lg px-2.5 py-1.5 border border-amber-500/30">
+              <div className="absolute top-3 left-3 flex items-center gap-2 glass-gold rounded-lg px-2.5 py-1.5 border border-amber-500/30 z-10">
                 <LiveDot color="amber" />
-                <span className="text-[11px] font-bold text-amber-400">LSC Chain · Live DAG</span>
+                <span className="text-[11px] font-bold text-amber-400">LSC Chain · Genesis Pulse</span>
               </div>
-              <div className="absolute top-3 right-3 glass rounded-lg px-2 py-1 text-[10px] font-mono text-amber-400 border border-amber-500/20">
+              <div className="absolute top-3 right-3 glass rounded-lg px-2 py-1 text-[10px] font-mono text-amber-400 border border-amber-500/20 z-10">
                 2027 Target
               </div>
-              <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5">
+              <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5 z-10">
                 <div className="flex items-end justify-between gap-3">
                   <div>
                     <div className="text-[10px] font-bold uppercase tracking-widest text-amber-400/70 mb-1">LSC Coin</div>
-                    <div className="text-base md:text-lg font-black text-white leading-tight">DAG Blockchain Structure</div>
+                    <div className="text-base md:text-lg font-black text-white leading-tight">Live Genesis Heartbeat</div>
                     <div className="text-xs text-gray-400 mt-1">100,000+ TPS · 2.1B supply · 1 AIDAG = 100 LSC</div>
                   </div>
                   <span className="flex-shrink-0 inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 group-hover:text-amber-300 group-hover:translate-x-1 transition-all">
