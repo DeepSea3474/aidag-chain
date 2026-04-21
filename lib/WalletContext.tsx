@@ -202,50 +202,74 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     merge({ bnbBalance: bnb, aidagBalance: aidag, aidagBalanceRaw: aidagRaw });
   }, [state.address, merge]);
 
+  // ── Finalize: switch chain → sign → balances ──────────────
+  const finalizeConnection = useCallback(async (provider: any, rawAddress: string, type: WalletType) => {
+    const address = rawAddress.toLowerCase();
+
+    try {
+      const currentChain: string = await provider.request({ method: 'eth_chainId' });
+      if (parseInt(currentChain, 16) !== BSC_CHAIN_ID) {
+        try {
+          await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BSC_CHAIN_HEX }] });
+        } catch (switchErr: any) {
+          if (switchErr.code === 4902) {
+            await provider.request({ method: 'wallet_addEthereumChain', params: [BSC_NETWORK_PARAMS] });
+          }
+        }
+      }
+    } catch {}
+
+    merge({ isSigning: true });
+    let signature = '';
+    try {
+      signature = await requestSignature(provider, address);
+    } catch (sigErr: any) {
+      // signature optional on WC flows where some wallets reject silently — keep going
+      console.warn('Signature skipped:', sigErr?.message);
+    }
+
+    const [bnb, aidag, aidagRaw] = await Promise.all([
+      fetchBnbBalance(address),
+      fetchAidagBalance(address),
+      fetchAidagBalanceRaw(address),
+    ]);
+
+    merge({
+      address, chainId: BSC_CHAIN_ID, walletType: type,
+      bnbBalance: bnb, aidagBalance: aidag, aidagBalanceRaw: aidagRaw,
+      isConnected: true, isConnecting: false, isSigning: false,
+      isSigned: !!signature, signature: signature || null, error: null,
+    });
+  }, [merge, requestSignature]);
+
   // ── Core connect flow ─────────────────────────────────────
   const connect = useCallback(async (type: WalletType) => {
     merge({ isConnecting: true, error: null, modalOpen: false });
 
     try {
-      // WalletConnect — open @reown/appkit modal
-      if (type === 'walletconnect') {
-        const { openWeb3Modal } = await import('./web3modal');
-        await openWeb3Modal();
-        merge({ isConnecting: false });
-        return;
-      }
-
       const isMobile = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-      const provider = getProvider(type) ?? (window as any).ethereum;
+      const injected = getProvider(type) ?? (window as any).ethereum;
 
-      // Mobile + no injected provider → open the dApp inside the wallet's own browser via deep link
-      if (isMobile && !provider) {
-        const host = window.location.host;
-        const path = window.location.pathname + window.location.search;
-        const fullPath = host + path;
-        const fullUrl = window.location.href;
+      // Route to WalletConnect when:
+      //  • user explicitly chose WalletConnect, OR
+      //  • we're on mobile without an injected provider (regular Chrome/Safari)
+      const useWalletConnect = type === 'walletconnect' || (isMobile && !injected);
 
-        const deepLinks: Record<string, string> = {
-          metamask: `https://metamask.app.link/dapp/${fullPath}`,
-          trust:    `https://link.trustwallet.com/open_url?coin_id=20000714&url=${encodeURIComponent(fullUrl)}`,
-          coinbase: `https://go.cb-w.com/dapp?cb_url=${encodeURIComponent(fullUrl)}`,
-          okx:      `okx://wallet/dapp/url?dappUrl=${encodeURIComponent(fullUrl)}`,
-          binance:  `https://app.binance.com/en/download`,
-        };
-        if (deepLinks[type]) {
-          window.location.href = deepLinks[type];
+      if (useWalletConnect) {
+        const { connectViaWalletConnect } = await import('./web3modal');
+        const result = await connectViaWalletConnect();
+        if (!result || !result.address) {
           merge({ isConnecting: false });
           return;
         }
-        // Fallback: WalletConnect QR
-        const { openWeb3Modal } = await import('./web3modal');
-        await openWeb3Modal();
-        merge({ isConnecting: false });
+        const wcProvider = result.provider ?? (window as any).ethereum;
+        if (!wcProvider) throw new Error('WalletConnect provider unavailable');
+        await finalizeConnection(wcProvider, result.address, type === 'walletconnect' ? 'walletconnect' : type);
         return;
       }
 
       // Desktop + no injected provider → install pages
-      if (!provider) {
+      if (!injected) {
         const installUrls: Record<string, string> = {
           metamask: 'https://metamask.io/download/',
           coinbase:  'https://www.coinbase.com/wallet/downloads',
@@ -258,46 +282,16 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // 1. Request accounts
-      const accounts: string[] = await provider.request({ method: 'eth_requestAccounts' });
+      // Direct EIP-1193 (injected/extension/in-app browser)
+      const accounts: string[] = await injected.request({ method: 'eth_requestAccounts' });
       if (!accounts.length) throw new Error('No accounts returned');
-      const address = accounts[0].toLowerCase();
-
-      // 2. Switch to BSC
-      const currentChain: string = await provider.request({ method: 'eth_chainId' });
-      if (parseInt(currentChain, 16) !== BSC_CHAIN_ID) {
-        try {
-          await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BSC_CHAIN_HEX }] });
-        } catch (switchErr: any) {
-          if (switchErr.code === 4902) {
-            await provider.request({ method: 'wallet_addEthereumChain', params: [BSC_NETWORK_PARAMS] });
-          }
-        }
-      }
-
-      // 3. Request AIDAG Chain signature
-      merge({ isSigning: true });
-      const signature = await requestSignature(provider, address);
-
-      // 4. Fetch balances from BSC
-      const [bnb, aidag, aidagRaw] = await Promise.all([
-        fetchBnbBalance(address),
-        fetchAidagBalance(address),
-        fetchAidagBalanceRaw(address),
-      ]);
-
-      merge({
-        address, chainId: BSC_CHAIN_ID, walletType: type,
-        bnbBalance: bnb, aidagBalance: aidag, aidagBalanceRaw: aidagRaw,
-        isConnected: true, isConnecting: false, isSigning: false,
-        isSigned: true, signature, error: null,
-      });
+      await finalizeConnection(injected, accounts[0], type);
 
     } catch (err: any) {
       const msg = err?.message || 'Connection failed';
       merge({ isConnecting: false, isSigning: false, error: msg.includes('rejected') ? 'Signature rejected. Please approve to connect.' : msg });
     }
-  }, [getProvider, requestSignature, merge]);
+  }, [getProvider, finalizeConnection, merge]);
 
   // ── Disconnect ────────────────────────────────────────────
   const disconnect = useCallback(() => {
