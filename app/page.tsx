@@ -643,7 +643,6 @@ export default function Home() {
                 </svg>
                 {t.hero_buy}
               </Link>
-              <WalletButton className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base justify-center" />
               <Link href="/lsc" className="btn btn-gold w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-bold justify-center">
                 ⬡ {t.hero_lsc}
               </Link>

@@ -119,6 +119,7 @@ export interface WalletContextValue extends WalletState {
   refreshBalances: () => Promise<void>;
   switchToBSC: () => Promise<void>;
   sendPresaleTx: (bnbAmount: string) => Promise<string>;
+  getActiveProvider: () => Promise<any | null>;
 }
 
 // ── Context ───────────────────────────────────────────────────
@@ -370,13 +371,62 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  // ── Get active provider (window.ethereum OR re-init WC OR deeplink) ──
+  const getActiveProvider = useCallback(async (): Promise<any | null> => {
+    if (typeof window === 'undefined') return null;
+    const eth = (window as any).ethereum;
+    if (eth) {
+      // Prefer the specific wallet by type if present
+      const specific = state.walletType ? getProvider(state.walletType) : null;
+      return specific ?? eth;
+    }
+    // No injected — try restoring WalletConnect session
+    try {
+      const { initWeb3Modal } = await import('./web3modal');
+      const m = await initWeb3Modal();
+      if (m) {
+        let p: any = null;
+        try { p = m.getWalletProvider ? m.getWalletProvider() : null; } catch {}
+        if (!p) { try { p = m.getProvider ? m.getProvider('eip155') : null; } catch {} }
+        if (p) return p;
+      }
+    } catch {}
+    return null;
+  }, [state.walletType, getProvider]);
+
   // ── Send presale BNB transaction ──────────────────────────
   const sendPresaleTx = useCallback(async (bnbAmount: string): Promise<string> => {
-    const provider = (window as any).ethereum;
-    if (!provider || !state.address) throw new Error('Wallet not connected');
+    if (!state.address) throw new Error('Wallet not connected');
+    let provider = await getActiveProvider();
+
+    // No provider available — on mobile, deeplink to the wallet's in-app browser
+    if (!provider) {
+      const isMobile = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+      if (isMobile && state.walletType) {
+        const link = buildMobileDeeplink(state.walletType);
+        if (link) {
+          window.location.href = link;
+          throw new Error('Opening your wallet app — please complete the transaction there.');
+        }
+      }
+      throw new Error('Wallet provider unavailable. Please reconnect your wallet.');
+    }
+
+    // Ensure BSC
+    try {
+      const cur = await provider.request({ method: 'eth_chainId' });
+      if (parseInt(cur, 16) !== BSC_CHAIN_ID) {
+        try {
+          await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BSC_CHAIN_HEX }] });
+        } catch (sw: any) {
+          if (sw.code === 4902) {
+            await provider.request({ method: 'wallet_addEthereumChain', params: [BSC_NETWORK_PARAMS] });
+          }
+        }
+      }
+    } catch {}
 
     const weiHex = '0x' + BigInt(Math.round(parseFloat(bnbAmount) * 1e18)).toString(16);
-
     const txHash: string = await provider.request({
       method: 'eth_sendTransaction',
       params: [{
@@ -388,7 +438,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       }],
     });
     return txHash;
-  }, [state.address]);
+  }, [state.address, state.walletType, getActiveProvider, buildMobileDeeplink]);
 
   // ── Restore persisted session + listen for account/chain changes ──
   useEffect(() => {
@@ -477,6 +527,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     refreshBalances,
     switchToBSC,
     sendPresaleTx,
+    getActiveProvider,
   };
 
   return <WalletCtx.Provider value={value}>{children}</WalletCtx.Provider>;

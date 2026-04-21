@@ -177,14 +177,9 @@ export default function PresalePage() {
     if (!wallet.isConnected) { wallet.openModal(); return; }
     if (!bnbAmount || parseFloat(bnbAmount) <= 0) return;
     if (wallet.chainId !== 56) {
-      const eth = (window as any).ethereum;
-      if (eth) {
-        try { await eth.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] }); }
-        catch {}
-      }
+      try { await wallet.switchToBSC(); } catch {}
       return;
     }
-
     setTxStep('confirm');
     setTxError('');
     setTxHash('');
@@ -193,21 +188,7 @@ export default function PresalePage() {
   const confirmTx = async () => {
     setTxStep('sending');
     try {
-      const eth = (window as any).ethereum;
-      if (!eth) throw new Error('No wallet found');
-
-      const bnbInWei = BigInt(Math.round(parseFloat(bnbAmount) * 1e18)).toString(16);
-      const tx = await eth.request({
-        method: 'eth_sendTransaction',
-        params: [{
-          from: wallet.address,
-          to: FOUNDER_WALLET,
-          value: '0x' + bnbInWei,
-          gas: '0x5208',
-          chainId: '0x38',
-        }],
-      });
-
+      const tx = await wallet.sendPresaleTx(bnbAmount);
       setTxHash(tx);
       setTxStep('done');
       await wallet.refreshBalances();
