@@ -5,3 +5,5 @@ out/
 .vercel/
 workspace/
 *.zip
+tsconfig.tsbuildinfo
+.data/
