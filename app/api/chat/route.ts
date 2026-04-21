@@ -125,10 +125,26 @@ ${ownKnowledge
   : '🔍 SoulwareAI genel bilgi tabanından yanıt üretiyor.'}${founder ? FOUNDER_PROMPT_OVERLAY : ''}`;
 
     // ── STEP 5: Call OpenAI as language engine (Phase 1) ─────────────
-    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    // Prefer Replit OpenAI integration (AI_INTEGRATIONS_*). Fall back to raw
+    // OPENAI_API_KEY if the integration vars are not set.
+    const apiKey =
+      process.env.AI_INTEGRATIONS_OPENAI_API_KEY ||
+      process.env.OPENAI_API_KEY;
+    const baseURL =
+      process.env.AI_INTEGRATIONS_OPENAI_BASE_URL || undefined;
+
+    if (!apiKey) {
+      console.error('[SoulwareAI Chat] no OpenAI key configured');
+      return NextResponse.json(
+        { error: 'SoulwareAI language engine offline (no key)' },
+        { status: 503 },
+      );
+    }
+
+    const client = new OpenAI({ apiKey, baseURL });
 
     const completion = await client.chat.completions.create({
-      model: 'gpt-4.1',
+      model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: fullSystemPrompt },
         ...messages.map((m: { role: string; content: string }) => ({

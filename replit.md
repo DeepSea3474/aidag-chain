@@ -20,13 +20,15 @@ A crypto first - Blockchain project fully autonomously managed by SoulwareAI.
 
 ## Project Structure
 ```
-/pages              - Next.js pages (index, presale, dao, docs, contract)
-/pages/api          - API routes (chat, chain-data, crypto-prices, market-data)
-/pages/api/soulware - Autonomous engine APIs (autonomous, governance, innovations, develop)
-/components         - React components (Header, Layout, WalletButton, CryptoTicker, GovernanceSection, ContractAddresses, Partners)
-/lib                - Config, utils, ABIs, blockchain.js, useChainData.js
-/public             - Static files (logo.svg, logo.png, soulwareai.jpeg)
-/styles             - CSS files (globals.css, components.css)
+/app                 - Next.js App Router pages (index, presale, dao, soulware, lsc, sovereign, chat)
+/app/api             - Dynamic server routes (chat, lsc/genesis, presale/stats)
+/app/api/soulware    - Autonomous engine routes (status, command, verify, queue/[id])
+/components          - React components (Header, WalletButton, CryptoTicker, GovernanceSection, ContractAddresses, Partners, SoulwareLivePanel)
+/lib                 - Shared libs (blockchain, useChainData, soulware-knowledge-base, soulware-sovereign, lsc-genesis-engine)
+/lib/server          - Server-only code (orchestrator, dag-iterator, chain-reader)
+/public              - Static files (logo.svg, logo.png, soulwareai.jpeg)
+/styles              - CSS files (globals.css, components.css)
+/functions, wrangler.toml - LEGACY Cloudflare Pages artifacts, unused (see CLOUDFLARE_DEPLOYMENT.md)
 ```
 
 ## Running
@@ -131,14 +133,23 @@ Configured in `.env.local`:
 - **blockchain.js**: Real BNB price fetching from Binance/CoinGecko/CryptoCompare with fallback
 - **useChainData.js**: React hook for real-time blockchain data (30s refresh)
 
-## API Infrastructure
-- **`/api/chat`**: SoulwareAI chat with GPT-4o-mini, live blockchain data context, founder mode authentication, full autonomous intelligence
-- **`/api/soulware/autonomous`**: Autonomous engine - BSC monitoring, DEX pair tracking, CEX applications, chain evolution roadmap
-- **`/api/soulware/governance`**: DAO governance - proposals, on-chain voting power verification, autonomous proposal creation
-- **`/api/soulware/innovations`**: Self-designed innovations - QSaaS, AI Shield, AI Auditor, DAG Payment Gateway, QRNG, AI Oracle
-- **`/api/soulware/develop`**: Self-development engine - module planning and autonomous development tracking
-- **`/api/chain-data`**: Real-time blockchain data (presale stats, token info, network status)
-- **`/api/crypto-prices`**: Live cryptocurrency prices from CoinGecko/CryptoCompare
+## API Infrastructure (current routes under `app/api/`)
+- **`/api/chat`** (dynamic): SoulwareAI chat — uses Replit OpenAI integration
+  (`AI_INTEGRATIONS_OPENAI_API_KEY` / `AI_INTEGRATIONS_OPENAI_BASE_URL`) with
+  `OPENAI_API_KEY` as a fallback. Model: `gpt-4o-mini`. Founder mode auth via
+  double-SHA256 comparison against `SOVEREIGN_HASH`.
+- **`/api/soulware/status`** (dynamic): Full orchestrator state — chain,
+  treasury, token, presale, cex, dex, lsc, decisions, queue, whitelist,
+  websiteProbe, evolutionScore.
+- **`/api/soulware/command`** (dynamic): Founder-authenticated command channel.
+- **`/api/soulware/verify`** (dynamic): Founder-key verification endpoint.
+- **`/api/soulware/queue/[id]`** (dynamic): Approve/reject autonomous proposals.
+- **`/api/lsc/genesis`** (dynamic): LSC genesis state + real DAG iterations.
+- **`/api/presale/stats`** (static): Presale stats snapshot.
+(Legacy routes `/api/chain-data`, `/api/crypto-prices`,
+`/api/soulware/{autonomous,governance,innovations,develop}` from the pre-App-
+Router codebase no longer exist — the same data now comes from
+`/api/soulware/status` and the client-side live ticker.)
 
 ## SoulwareAI Autonomous Engine
 - **Proposal Engine**: Creates, evaluates, and executes governance proposals

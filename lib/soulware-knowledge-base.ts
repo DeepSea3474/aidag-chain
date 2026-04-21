@@ -1,4 +1,3 @@
-'use client';
 // ═══════════════════════════════════════════════════════════════════
 //  SoulwareAI — Living Knowledge Base
 //  Owner: AIDAG Chain & DeepSea3474 ONLY
