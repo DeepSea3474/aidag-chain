@@ -1,8 +1,13 @@
+'use client';
+import { useLang } from '../lib/LanguageContext';
+
 export default function Roadmap({ id = "roadmap" }) {
+  const { t } = useLang();
+
   const phases = [
     {
       phase: "PHASE 1",
-      title: "Foundation & SoulwareAI Integration",
+      titleKey: "rm_p1_title",
       status: "completed",
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{filter: 'drop-shadow(0 0 6px rgba(34, 197, 94, 0.7))'}}>
@@ -18,7 +23,7 @@ export default function Roadmap({ id = "roadmap" }) {
     },
     {
       phase: "PHASE 2",
-      title: "AI Autonomous Development",
+      titleKey: "rm_p2_title",
       status: "completed",
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{filter: 'drop-shadow(0 0 6px rgba(34, 197, 94, 0.7))'}}>
@@ -34,7 +39,7 @@ export default function Roadmap({ id = "roadmap" }) {
     },
     {
       phase: "PHASE 3",
-      title: "Token Launch & Presale",
+      titleKey: "rm_p3_title",
       status: "active",
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{filter: 'drop-shadow(0 0 8px rgba(6, 182, 212, 0.8))'}}>
@@ -50,7 +55,7 @@ export default function Roadmap({ id = "roadmap" }) {
     },
     {
       phase: "PHASE 4",
-      title: "Cross-Chain & DeFi",
+      titleKey: "rm_p4_title",
       status: "upcoming",
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{filter: 'drop-shadow(0 0 4px rgba(107, 114, 128, 0.5))'}}>
@@ -66,7 +71,7 @@ export default function Roadmap({ id = "roadmap" }) {
     },
     {
       phase: "PHASE 5",
-      title: "Own DAG Chain (Q1 2027)",
+      titleKey: "rm_p5_title",
       status: "upcoming",
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{filter: 'drop-shadow(0 0 4px rgba(107, 114, 128, 0.5))'}}>
@@ -82,7 +87,7 @@ export default function Roadmap({ id = "roadmap" }) {
     },
     {
       phase: "PHASE 6",
-      title: "Quantum Ecosystem & Top 10",
+      titleKey: "rm_p6_title",
       status: "upcoming",
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{filter: 'drop-shadow(0 0 4px rgba(107, 114, 128, 0.5))'}}>
@@ -99,9 +104,9 @@ export default function Roadmap({ id = "roadmap" }) {
   ];
 
   const statusLabel = (status) => {
-    if (status === "completed") return { text: "COMPLETED", color: "bg-green-500/20 text-green-400 border-green-500/30" };
-    if (status === "active") return { text: "ACTIVE", color: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30" };
-    return { text: "UPCOMING", color: "bg-gray-700/50 text-gray-400 border-gray-600" };
+    if (status === "completed") return { text: t('rm_completed'), color: "bg-green-500/20 text-green-400 border-green-500/30" };
+    if (status === "active")    return { text: t('rm_active'),    color: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30" };
+    return { text: t('rm_upcoming'), color: "bg-gray-700/50 text-gray-400 border-gray-600" };
   };
 
   const getIconContainerStyle = (status) => {
@@ -121,9 +126,9 @@ export default function Roadmap({ id = "roadmap" }) {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{textShadow: '0 0 30px rgba(6, 182, 212, 0.2), 0 0 60px rgba(139, 92, 246, 0.1)'}}>
-            Roadmap
+            {t('rm_title')}
           </h2>
-          <p className="text-gray-400">SoulwareAI autonomous development plan - from BSC token to own DAG chain</p>
+          <p className="text-gray-400">{t('rm_sub')}</p>
         </div>
 
         <div className="space-y-6">
@@ -174,7 +179,7 @@ export default function Roadmap({ id = "roadmap" }) {
                   
                   <h3 className="text-xl md:text-2xl font-bold text-white mb-4" style={
                     phase.status === "active" ? {textShadow: '0 0 15px rgba(6, 182, 212, 0.15)'} : {}
-                  }>{phase.title}</h3>
+                  }>{t(phase.titleKey)}</h3>
                   
                   <ul className="space-y-2">
                     {phase.items.map((item, i) => (

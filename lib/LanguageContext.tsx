@@ -17,11 +17,14 @@ export const LANGS = [
 export type LangCode = typeof LANGS[number]['code'];
 
 import { TRANSLATIONS, TranslationKey } from './translations';
+import { EXT_TRANSLATIONS, ExtKey } from './translations-ext';
+
+export type AnyKey = TranslationKey | ExtKey;
 
 interface Ctx {
   lang: LangCode;
   setLang: (c: LangCode) => void;
-  t: (key: TranslationKey) => string;
+  t: (key: AnyKey) => string;
   dir: 'ltr' | 'rtl';
 }
 
@@ -53,9 +56,17 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const t = (key: TranslationKey): string => {
-    const dict = TRANSLATIONS[lang] || TRANSLATIONS.en;
-    return dict[key] ?? TRANSLATIONS.en[key] ?? key;
+  const t = (key: AnyKey): string => {
+    const base = TRANSLATIONS[lang] || TRANSLATIONS.en;
+    const baseEn = TRANSLATIONS.en;
+    const ext = EXT_TRANSLATIONS[lang] || {};
+    const extEn = EXT_TRANSLATIONS.en || {};
+    const k = key as string;
+    return (ext as Record<string, string>)[k]
+      ?? (base as Record<string, string>)[k]
+      ?? (extEn as Record<string, string>)[k]
+      ?? (baseEn as Record<string, string>)[k]
+      ?? k;
   };
 
   const dir: 'ltr' | 'rtl' = lang === 'ar' ? 'rtl' : 'ltr';
@@ -73,7 +84,12 @@ export function useLang() {
     return {
       lang: 'en' as LangCode,
       setLang: () => {},
-      t: (k: TranslationKey) => (TRANSLATIONS.en[k] ?? k) as string,
+      t: (k: AnyKey) => {
+        const kk = k as string;
+        return ((EXT_TRANSLATIONS.en as Record<string, string>)[kk]
+          ?? (TRANSLATIONS.en as Record<string, string>)[kk]
+          ?? kk);
+      },
       dir: 'ltr' as const,
     };
   }

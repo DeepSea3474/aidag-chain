@@ -251,114 +251,57 @@ const T: Record<LangCode, Translations> = {
   },
 };
 
-// ── Static feature data ───────────────────────────────────────────────────────
+// ── Static feature data (titles/descs are translation keys) ─────────────────
+const FEATURE_ICONS = {
+  sw: (
+    <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25zm.75-12h9v9h-9v-9z" />
+    </svg>
+  ),
+  qr: (
+    <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+    </svg>
+  ),
+  dao: (
+    <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+    </svg>
+  ),
+  bsc: (
+    <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+    </svg>
+  ),
+  lock: (
+    <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+    </svg>
+  ),
+  lsc: (
+    <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+    </svg>
+  ),
+};
+
 const FEATURES = [
-  {
-    accent: 'cyan',
-    border: 'border-cyan-500/20',
-    glow: 'bg-cyan-500/10',
-    icon: (
-      <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25zm.75-12h9v9h-9v-9z" />
-      </svg>
-    ),
-    title: 'SoulwareAI — AIDAG\'s Own Brain',
-    desc: 'Not OpenAI. Not GPT-4. Not any external AI. SoulwareAI is the proprietary autonomous brain & cell system built INTO AIDAG Chain. It spawns modules and agents forming the DAG loop.',
-    link: null,
-  },
-  {
-    accent: 'purple',
-    border: 'border-purple-500/20',
-    glow: 'bg-purple-500/10',
-    icon: (
-      <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-      </svg>
-    ),
-    title: 'Quantum-Resistant Security',
-    desc: 'QSaaS layer using CRYSTALS-Kyber, Dilithium, and SPHINCS+ post-quantum algorithms. The network is shielded against attacks from next-generation quantum computers.',
-    link: null,
-  },
-  {
-    accent: 'blue',
-    border: 'border-blue-500/20',
-    glow: 'bg-blue-500/10',
-    icon: (
-      <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-      </svg>
-    ),
-    title: 'DAO Governance',
-    desc: '1 AIDAG = 1 Vote. Holders create proposals on-chain. SoulwareAI\'s DAO Cell evaluates and executes approved proposals autonomously. Community shapes the future.',
-    link: '/dao',
-  },
-  {
-    accent: 'yellow',
-    border: 'border-yellow-500/20',
-    glow: 'bg-yellow-500/10',
-    icon: (
-      <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
-      </svg>
-    ),
-    title: 'BSC Native + Multi-Chain',
-    desc: 'AIDAG Token deployed on Binance Smart Chain (BEP-20). Ethereum & Polygon bridge cells are operational. LSC Coin bridge opens at 2027 mainnet launch.',
-    link: null,
-  },
-  {
-    accent: 'emerald',
-    border: 'border-emerald-500/20',
-    glow: 'bg-emerald-500/10',
-    icon: (
-      <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-      </svg>
-    ),
-    title: 'Founder Lock · No Mint Ever',
-    desc: `${FOUNDER_COINS.toLocaleString()} founder tokens are time-locked 1 year — visible on BSCScan. No mint function exists in the contract. ${MAX_SUPPLY.toLocaleString()} AIDAG is the permanent ceiling.`,
-    link: BSCSCAN_TOKEN_URL,
-  },
-  {
-    accent: 'amber',
-    border: 'border-amber-500/20',
-    glow: 'bg-amber-500/10',
-    icon: (
-      <svg width="26" height="26" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-      </svg>
-    ),
-    title: 'LSC Chain — DAG 2027',
-    desc: 'SoulwareAI\'s LSC Builder Cell autonomously constructs the Directed Acyclic Graph blockchain. Target: 100,000+ TPS. Quantum-resistant SAC consensus. AIDAG holders get priority LSC allocation.',
-    link: '/lsc',
-  },
-];
+  { accent: 'cyan',    border: 'border-cyan-500/20',    glow: 'bg-cyan-500/10',    icon: FEATURE_ICONS.sw,   titleKey: 'ft_sw_t',   descKey: 'ft_sw_d',   link: null as string | null },
+  { accent: 'purple',  border: 'border-purple-500/20',  glow: 'bg-purple-500/10',  icon: FEATURE_ICONS.qr,   titleKey: 'ft_qr_t',   descKey: 'ft_qr_d',   link: null },
+  { accent: 'blue',    border: 'border-blue-500/20',    glow: 'bg-blue-500/10',    icon: FEATURE_ICONS.dao,  titleKey: 'ft_dao_t',  descKey: 'ft_dao_d',  link: '/dao' },
+  { accent: 'yellow',  border: 'border-yellow-500/20',  glow: 'bg-yellow-500/10',  icon: FEATURE_ICONS.bsc,  titleKey: 'ft_bsc_t',  descKey: 'ft_bsc_d',  link: null },
+  { accent: 'emerald', border: 'border-emerald-500/20', glow: 'bg-emerald-500/10', icon: FEATURE_ICONS.lock, titleKey: 'ft_lock_t', descKey: 'ft_lock_d', link: BSCSCAN_TOKEN_URL },
+  { accent: 'amber',   border: 'border-amber-500/20',   glow: 'bg-amber-500/10',   icon: FEATURE_ICONS.lsc,  titleKey: 'ft_lsc_t',  descKey: 'ft_lsc_d',  link: '/lsc' },
+] as const;
 
 const FAQS = [
-  {
-    q: 'What is AIDAG Token?',
-    a: `AIDAG is a BEP-20 token on Binance Smart Chain at contract ${TOKEN_CONTRACT}. It is the first layer of the AIDAG ecosystem, governed by SoulwareAI — the chain's own autonomous brain. Zero human founder intervention post-genesis.`,
-  },
-  {
-    q: 'What is SoulwareAI — and is it OpenAI or GPT?',
-    a: 'SoulwareAI is ABSOLUTELY NOT OpenAI, GPT-4, or any external AI service. SoulwareAI is the proprietary autonomous brain and cell system of AIDAG Chain itself. It was built into the chain\'s architecture and produces modules and agents that form the DAG chain loop between AIDAG Token and LSC Coin.',
-  },
-  {
-    q: 'How does the AIDAG ↔ LSC ecosystem work?',
-    a: 'AIDAG Token runs on BSC as the economic layer. SoulwareAI autonomously builds LSC Chain (a DAG blockchain). When LSC mainnet launches Q1 2027, AIDAG holders receive priority LSC coin allocation. The two tokens form a complementary autonomous loop governed by SoulwareAI modules.',
-  },
-  {
-    q: 'What is the AIDAG contract address?',
-    a: `AIDAG token contract: ${TOKEN_CONTRACT} on Binance Smart Chain (Chain ID: 56). Fully verified on BSCScan. No mint function. No admin keys. Immutable and autonomous.`,
-  },
-  {
-    q: 'How do I participate in DAO governance?',
-    a: 'Every AIDAG token holder automatically has voting rights. 1 AIDAG = 1 Vote. Go to the DAO portal, connect your wallet, create proposals or vote on existing ones. SoulwareAI\'s DAO Cell executes approved proposals autonomously on-chain.',
-  },
-  {
-    q: 'What are presale prices and listing price?',
-    a: `Stage 1 presale: $${PRESALE_STAGE1_PRICE} per AIDAG. Stage 2: $${PRESALE_STAGE2_PRICE}. Exchange listing target: $${LISTING_PRICE}. Revenue split: 60% to founder wallet, 40% to SoulwareAI autonomous liquidity pool.`,
-  },
-];
+  { qKey: 'fq1_q', aKey: 'fq1_a' },
+  { qKey: 'fq2_q', aKey: 'fq2_a' },
+  { qKey: 'fq3_q', aKey: 'fq3_a' },
+  { qKey: 'fq4_q', aKey: 'fq4_a' },
+  { qKey: 'fq5_q', aKey: 'fq5_a' },
+  { qKey: 'fq6_q', aKey: 'fq6_a' },
+] as const;
 
 // ── Utility components ────────────────────────────────────────────────────────
 function CopyBtn({ text }: { text: string }) {
@@ -384,7 +327,7 @@ function LiveDot({ color = 'emerald' }: { color?: string }) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function Home() {
   const chain = useChainData();
-  const { lang, setLang } = useLang();
+  const { lang, setLang, t: tr } = useLang();
   const [langOpen, setLangOpen] = useState(false);
   const [lscOpen, setLscOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -837,8 +780,8 @@ export default function Home() {
                   <div className={`w-12 h-12 rounded-xl ${f.glow} border ${f.border} flex items-center justify-center text-${f.accent}-400 mb-5`}>
                     {f.icon}
                   </div>
-                  <h3 className="font-bold text-base mb-2">{f.title}</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed">{f.desc}</p>
+                  <h3 className="font-bold text-base mb-2">{tr(f.titleKey)}</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">{tr(f.descKey)}</p>
                   {f.link && (
                     <Link href={f.link} className={`inline-flex items-center gap-1 mt-4 text-xs font-bold text-${f.accent}-400 hover:text-${f.accent}-300 transition-colors`}>
                       {f.link === '/dao' ? 'Open DAO Portal' : 'Open Dashboard'} →
@@ -1049,11 +992,11 @@ export default function Home() {
               <div key={i} className={`glass rounded-2xl border overflow-hidden transition-all duration-200 ${openFaq === i ? 'border-cyan-500/30' : 'border-white/[0.05]'}`}>
                 <button onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   className="w-full flex justify-between items-center px-6 py-5 text-left gap-4">
-                  <span className="font-semibold text-sm md:text-base">{faq.q}</span>
+                  <span className="font-semibold text-sm md:text-base">{tr(faq.qKey)}</span>
                   <span className={`flex-shrink-0 w-6 h-6 rounded-full border flex items-center justify-center text-sm font-bold transition-all ${openFaq === i ? 'border-cyan-500 text-cyan-400 rotate-45' : 'border-gray-700 text-gray-500'}`}>+</span>
                 </button>
                 {openFaq === i && (
-                  <div className="px-6 pb-5 text-sm text-gray-400 leading-relaxed border-t border-white/[0.05] pt-4">{faq.a}</div>
+                  <div className="px-6 pb-5 text-sm text-gray-400 leading-relaxed border-t border-white/[0.05] pt-4">{tr(faq.aKey)}</div>
                 )}
               </div>
             ))}
