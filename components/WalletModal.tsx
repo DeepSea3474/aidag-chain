@@ -1,11 +1,12 @@
 'use client';
 import { useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { useWalletContext, type WalletType } from '../lib/WalletContext';
 
 interface WalletOption {
   type: WalletType;
   name: string;
-  icon: string;
+  logo: string;
   desc: string;
   recommended?: boolean;
   mobile?: boolean;
@@ -16,7 +17,7 @@ const WALLET_OPTIONS: WalletOption[] = [
   {
     type: 'metamask',
     name: 'MetaMask',
-    icon: '🦊',
+    logo: '/wallets/metamask.svg',
     desc: 'Browser extension · Most popular',
     recommended: true,
     detectFn: () => typeof window !== 'undefined' && !!(window as any).ethereum?.isMetaMask,
@@ -24,7 +25,7 @@ const WALLET_OPTIONS: WalletOption[] = [
   {
     type: 'trust',
     name: 'Trust Wallet',
-    icon: '🛡️',
+    logo: '/wallets/trustwallet.svg',
     desc: 'Mobile & browser · Binance official',
     mobile: true,
     detectFn: () => typeof window !== 'undefined' && !!(window as any).ethereum?.isTrust,
@@ -32,7 +33,7 @@ const WALLET_OPTIONS: WalletOption[] = [
   {
     type: 'walletconnect',
     name: 'WalletConnect',
-    icon: '🔗',
+    logo: '/wallets/walletconnect.svg',
     desc: 'QR code · All wallets · Mobile',
     recommended: true,
     detectFn: () => true,
@@ -40,21 +41,21 @@ const WALLET_OPTIONS: WalletOption[] = [
   {
     type: 'coinbase',
     name: 'Coinbase Wallet',
-    icon: '🔵',
+    logo: '/wallets/coinbase.svg',
     desc: 'Browser extension · Mobile',
     detectFn: () => typeof window !== 'undefined' && !!(window as any).ethereum?.isCoinbaseWallet,
   },
   {
     type: 'binance',
     name: 'Binance Web3',
-    icon: '🟡',
+    logo: '/wallets/binance.svg',
     desc: 'Binance Web3 Wallet · BSC native',
     detectFn: () => typeof window !== 'undefined' && !!(window as any).BinanceChain,
   },
   {
     type: 'okx',
     name: 'OKX Wallet',
-    icon: '⚫',
+    logo: '/wallets/okx.svg',
     desc: 'OKX Web3 Wallet · Multi-chain',
     detectFn: () => typeof window !== 'undefined' && !!(window as any).okxwallet,
   },
@@ -162,9 +163,9 @@ export default function WalletModal() {
                     onClick={() => connect(opt.type)}
                     className="w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl glass border border-white/[0.06] hover:border-cyan-500/30 hover:bg-cyan-500/[0.04] transition-all group relative"
                   >
-                    {/* Wallet icon */}
-                    <div className="w-11 h-11 rounded-xl bg-white/[0.04] border border-white/[0.06] group-hover:border-cyan-500/20 flex items-center justify-center text-2xl flex-shrink-0 transition-all">
-                      {opt.icon}
+                    {/* Wallet logo */}
+                    <div className="w-11 h-11 rounded-xl bg-white/[0.04] border border-white/[0.06] group-hover:border-cyan-500/20 flex items-center justify-center flex-shrink-0 transition-all overflow-hidden p-1.5">
+                      <Image src={opt.logo} alt={opt.name} width={32} height={32} className="object-contain" />
                     </div>
 
                     {/* Info */}

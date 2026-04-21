@@ -1,6 +1,16 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { useWalletContext } from '../lib/WalletContext';
+
+const WALLET_LOGOS: Record<string, string> = {
+  metamask: '/wallets/metamask.svg',
+  trust: '/wallets/trustwallet.svg',
+  walletconnect: '/wallets/walletconnect.svg',
+  coinbase: '/wallets/coinbase.svg',
+  binance: '/wallets/binance.svg',
+  okx: '/wallets/okx.svg',
+};
 
 export default function WalletButton({ className = '' }: { className?: string }) {
   const {
@@ -23,9 +33,15 @@ export default function WalletButton({ className = '' }: { className?: string })
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const walletIcon: Record<string, string> = {
-    metamask: '🦊', trust: '🛡️', walletconnect: '🔗',
-    coinbase: '🔵', binance: '🟡', okx: '⚫', injected: '💼',
+  const renderLogo = (size: number) => {
+    if (!walletType || !WALLET_LOGOS[walletType]) {
+      return (
+        <svg width={size} height={size} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} className="text-cyan-400">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      );
+    }
+    return <Image src={WALLET_LOGOS[walletType]} alt={walletType} width={size} height={size} className="object-contain" />;
   };
 
   if (isLoading) {
@@ -62,10 +78,8 @@ export default function WalletButton({ className = '' }: { className?: string })
                            'bg-yellow-400'
           }`} />
 
-          {/* Wallet icon */}
-          {walletType && (
-            <span className="text-sm flex-shrink-0">{walletIcon[walletType] ?? '💼'}</span>
-          )}
+          {/* Wallet logo */}
+          <span className="flex-shrink-0 w-4 h-4 flex items-center justify-center">{renderLogo(16)}</span>
 
           {/* Address */}
           {isWrongChain ? (
@@ -97,7 +111,7 @@ export default function WalletButton({ className = '' }: { className?: string })
             {/* Wallet info */}
             <div className="px-4 py-4 border-b border-white/[0.05]">
               <div className="flex items-center gap-2.5 mb-3">
-                <span className="text-2xl">{walletType ? walletIcon[walletType] : '💼'}</span>
+                <span className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/[0.04] border border-white/[0.06] p-1">{renderLogo(20)}</span>
                 <div>
                   <div className="text-xs font-bold text-white capitalize">{walletType ?? 'Wallet'}</div>
                   <div className="flex items-center gap-1.5 mt-0.5">

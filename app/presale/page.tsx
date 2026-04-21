@@ -42,6 +42,16 @@ export default function PresalePage() {
   const [txStep, setTxStep] = useState<'idle' | 'confirm' | 'sending' | 'done' | 'error'>('idle');
   const [txHash, setTxHash] = useState('');
   const [txError, setTxError] = useState('');
+  const [mode, setMode] = useState<'dao' | 'buy' | null>(null);
+  const [daoPrefilled, setDaoPrefilled] = useState(false);
+  const DAO_FEE_USD = 10;
+
+  // Read ?mode= from URL
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const m = new URLSearchParams(window.location.search).get('mode');
+    if (m === 'dao' || m === 'buy') setMode(m);
+  }, []);
 
   // ── Presale Stats — fetched client-side (Cloudflare-compatible) ─────────────
   const STAGE1_HARD_CAP = 9_000_000;
@@ -136,6 +146,17 @@ export default function PresalePage() {
     const usd = v * PRESALE_STAGE1_PRICE;
     return (usd / chain.bnbPrice).toFixed(6);
   }, [chain.bnbPrice]);
+
+  // Pre-fill BNB amount with $10 equivalent if mode=dao (only once, when bnbPrice ready)
+  useEffect(() => {
+    if (mode === 'dao' && !daoPrefilled && chain.bnbPrice > 0 && !bnbAmount) {
+      const bnb = (DAO_FEE_USD / chain.bnbPrice).toFixed(6);
+      setBnbAmount(bnb);
+      const usd = parseFloat(bnb) * chain.bnbPrice;
+      setAidagAmount((usd / PRESALE_STAGE1_PRICE).toLocaleString('en-US', { maximumFractionDigits: 4 }));
+      setDaoPrefilled(true);
+    }
+  }, [mode, daoPrefilled, chain.bnbPrice, bnbAmount]);
 
   const handleBnbChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -306,6 +327,43 @@ export default function PresalePage() {
                 </div>
               ))}
             </div>
+
+            {/* Mode banner — DAO membership or open buy */}
+            {mode === 'dao' && (
+              <div className="glass rounded-2xl border border-purple-500/30 p-5 mb-5 relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-400/70 to-transparent" />
+                <div className="absolute -top-16 -right-16 w-40 h-40 rounded-full bg-purple-500/15 blur-3xl pointer-events-none" />
+                <div className="flex items-start gap-3 relative">
+                  <div className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-300 flex-shrink-0">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[10px] font-black uppercase tracking-widest text-purple-400 mb-0.5">DAO Membership</div>
+                    <div className="text-sm font-bold text-white">You&apos;re joining as a DAO member.</div>
+                    <div className="text-xs text-gray-400 mt-1">
+                      The amount below is pre-filled with the BNB equivalent of <span className="text-purple-300 font-bold">${DAO_FEE_USD}</span>
+                      {chain.bnbPrice > 0 && <> (BNB @ ${chain.bnbPrice.toFixed(2)})</>}.
+                      You&apos;ll receive AIDAG tokens plus DAO governance rights once mainnet activates.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            {mode === 'buy' && (
+              <div className="glass rounded-2xl border border-emerald-500/25 p-4 mb-5 flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-300 flex-shrink-0">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                  </svg>
+                </div>
+                <div className="min-w-0">
+                  <div className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Open Buy</div>
+                  <div className="text-xs text-gray-400">Choose any BNB amount. No membership required — you can upgrade to DAO later.</div>
+                </div>
+              </div>
+            )}
 
             {/* Main buy form */}
             <div className="glass rounded-3xl border border-white/[0.08] overflow-hidden">

@@ -1,8 +1,29 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@source "../app/**/*.{js,ts,jsx,tsx}";
+@source "../components/**/*.{js,ts,jsx,tsx}";
+@source "../lib/**/*.{js,ts,jsx,tsx}";
+
+@theme {
+  --color-cyan-50:  #ecfeff;
+  --color-cyan-100: #cffafe;
+  --color-cyan-200: #a5f3fc;
+  --color-cyan-300: #67e8f9;
+  --color-cyan-400: #22d3ee;
+  --color-cyan-500: #06b6d4;
+  --color-cyan-600: #0891b2;
+}
+
+/* Restore v3-compatible default border color so existing border-* classes keep their stroke */
+@layer base {
+  *, ::before, ::after { border-color: rgba(255,255,255,0.07); }
+  a { color: inherit; text-decoration: none; }
+  a:hover { text-decoration: none; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid #06b6d4; outline-offset: 2px; border-radius: 4px; }
+}
 
 :root {
   --cyan: #06b6d4;

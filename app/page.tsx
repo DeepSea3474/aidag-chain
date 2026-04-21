@@ -5,6 +5,9 @@ import dynamic from 'next/dynamic';
 import { useState, useEffect, useCallback } from 'react';
 import WalletButton from '../components/WalletButton';
 import Navbar from '../components/Navbar';
+import PresaleWidget from '../components/PresaleWidget';
+import LiveEcosystem from '../components/LiveEcosystem';
+import EcosystemCTA from '../components/EcosystemCTA';
 import { useChainData } from '../lib/useChainData';
 import {
   TOKEN_CONTRACT, BSCSCAN_TOKEN_URL, GITHUB_URL, TELEGRAM_URL, TWITTER_URL,
@@ -816,6 +819,12 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ══ LIVE ECOSYSTEM ══ */}
+        <LiveEcosystem />
+
+        {/* ══ JOIN CTA — DAO vs Buy ══ */}
+        <EcosystemCTA />
+
         {/* ══ PRESALE PREVIEW ══ */}
         <section id="presale" className="max-w-7xl mx-auto px-6 py-20">
           <div className="text-center mb-12">
@@ -851,14 +860,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <div className="text-center mt-8">
-            <Link href="/presale" className="btn btn-secondary px-10 py-4 rounded-2xl font-bold text-sm inline-flex items-center gap-2">
-              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Open Full Presale Platform
-            </Link>
-          </div>
+          <PresaleWidget />
         </section>
 
         {/* ══ TOKENOMICS ══ */}
