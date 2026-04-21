@@ -32,7 +32,7 @@ const LANGS = [
   { code: 'zh', flag: '🇨🇳', name: '中文' },
   { code: 'ar', flag: '🇸🇦', name: 'العربية' },
   { code: 'ja', flag: '🇯🇵', name: '日本語' },
-];
+] as const;
 
 type LangCode = typeof LANGS[number]['code'];
 
@@ -382,7 +382,7 @@ function LiveDot({ color = 'emerald' }: { color?: string }) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function Home() {
   const chain = useChainData();
-  const { lang } = useLang();
+  const { lang, setLang } = useLang();
   const [langOpen, setLangOpen] = useState(false);
   const [lscOpen, setLscOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);

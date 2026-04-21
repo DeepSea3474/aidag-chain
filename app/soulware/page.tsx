@@ -19,7 +19,7 @@ function LiveDot({ color = 'emerald', size = 'sm' }: { color?: string; size?: 'x
   return <span className={`${s} rounded-full ${c[color] ?? 'bg-emerald-400'} animate-pulse flex-shrink-0`} />;
 }
 
-const EVENT_TYPE_META: Record<string, { icon: string; color: string; badge: string }> = {
+const EVENT_TYPE_META: Record<string, { icon: IconName; color: string; badge: string }> = {
   DAG_NODE:  { icon: 'hexagon' as IconName, color: 'text-cyan-400',   badge: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' },
   DECISION:  { icon: 'bolt' as IconName,    color: 'text-amber-400',  badge: 'bg-amber-500/10 border-amber-500/20 text-amber-400' },
   AGENT:     { icon: 'cpu' as IconName,     color: 'text-purple-400', badge: 'bg-purple-500/10 border-purple-500/20 text-purple-400' },
