@@ -1,5 +1,7 @@
-node_modules/
-.next/
-*.zip
 aidag-replit/
+.next/
+node_modules/
+out/
+.vercel/
 workspace/
+*.zip
