@@ -8,7 +8,8 @@ export async function GET(req: NextRequest) {
   startOrchestrator();
   const orch = getOrchestrator();
   const url = new URL(req.url);
-  const limit = Math.max(1, Math.min(200, Number(url.searchParams.get('limit') ?? '50')));
+  const rawLimit = Number(url.searchParams.get('limit') ?? '50');
+  const limit = Math.max(1, Math.min(200, Number.isFinite(rawLimit) ? rawLimit : 50));
   const stats = orch.getLedgerStats();
   const recent = orch.getLedgerRecent(limit);
   const tips = orch.getLedgerTips();
