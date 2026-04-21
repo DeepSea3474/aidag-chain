@@ -1,2 +1,6 @@
 name = "aidag-chain"
+compatibility_date = "2025-04-01"
 pages_build_output_dir = "out"
+
+[vars]
+# Public vars only. Secrets (OPENAI_API_KEY) are set in Cloudflare dashboard.

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'crypto';
 import { SOVEREIGN_HASH, SOVEREIGN_IDENTITY } from '../../../../lib/soulware-sovereign';
 
-export function verifyKey(key: string): boolean {
+function verifyKey(key: string): boolean {
   const hash1 = createHash('sha256').update(key).digest('hex');
   const hash2 = createHash('sha256')
     .update(hash1 + 'SOULWAREAI_AIDAG_CHAIN_SOVEREIGN')

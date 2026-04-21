@@ -56,6 +56,13 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
         <div className="flex items-center gap-4 text-gray-500">
           <span className="flex items-center gap-1.5">
             <span className="live-dot" style={{ width: 6, height: 6 }}></span>
+            <span className="relative inline-flex items-center justify-center w-4 h-4 rounded-[4px] bg-gradient-to-br from-cyan-500/80 to-blue-600/80 border border-cyan-400/60 shadow-[0_0_8px_rgba(34,211,238,0.55)]">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2z" />
+                <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2z" />
+              </svg>
+              <span className="absolute -inset-px rounded-[4px] animate-pulse bg-cyan-400/10" />
+            </span>
             <span className="text-emerald-400 font-semibold">SoulwareAI</span> ONLINE
           </span>
           <span className="text-gray-700">|</span>
