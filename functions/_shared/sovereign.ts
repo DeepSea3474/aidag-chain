@@ -2,7 +2,7 @@
 // Mirrors lib/soulware-sovereign.ts but uses Web Crypto (no Node 'crypto' module).
 
 export const SOVEREIGN_HASH =
-  'd7db271645ba07c6e7dad14bc5d233efa13af2589bb34392ca29f98573eab7fc';
+  'e155b5560b6c45b999d942deb13c1d27eca250967db4f90efc4450ba0abca66d';
 
 export const SOVEREIGN_OWNER = 'DeepSea3474';
 export const SOVEREIGN_SYSTEM = 'SoulwareAI';

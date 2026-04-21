@@ -15,7 +15,7 @@
 // Only DeepSea3474 holds the source key (rotated 2026-04-21).
 // Verification: sha256( sha256(key) + 'SOULWAREAI_AIDAG_CHAIN_SOVEREIGN' )
 export const SOVEREIGN_HASH =
-  'd7db271645ba07c6e7dad14bc5d233efa13af2589bb34392ca29f98573eab7fc';
+  'e155b5560b6c45b999d942deb13c1d27eca250967db4f90efc4450ba0abca66d';
 
 export const SOVEREIGN_IDENTITY = {
   owner:        'DeepSea3474',
