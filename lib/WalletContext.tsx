@@ -11,7 +11,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 
 // ── Constants ─────────────────────────────────────────────────
 const TOKEN_CONTRACT  = '0xe6B06f7C63F6AC84729007ae8910010F6E721041';
-const FOUNDER_WALLET  = '0x2F3b33EDAEc10e94eDFA6B59F27a4adAb6bE26aB';
+const FOUNDER_WALLET  = '0xC16eC985D98Db96DE104Bf1e39E1F2Fdb9a712E9';
 const BSC_CHAIN_ID    = 56;
 const BSC_CHAIN_HEX   = '0x38';
 const BSC_RPC         = 'https://bsc-dataseed1.binance.org';

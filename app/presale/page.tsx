@@ -14,7 +14,7 @@ import {
   TELEGRAM_URL, TWITTER_URL, GITHUB_URL,
 } from '../../lib/constants';
 
-const FOUNDER_WALLET = '0x2F3b33EDAEc10e94eDFA6B59F27a4adAb6bE26aB';
+const FOUNDER_WALLET = '0xC16eC985D98Db96DE104Bf1e39E1F2Fdb9a712E9';
 
 function LiveDot({ color = 'emerald' }: { color?: string }) {
   const c: Record<string, string> = { emerald: 'bg-emerald-400', cyan: 'bg-cyan-400', amber: 'bg-amber-400' };

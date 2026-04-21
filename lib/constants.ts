@@ -5,8 +5,12 @@
 // and agents that form the DAG chain loop between AIDAG Token and LSC Coin.
 
 // ── AIDAG Token (BSC / BEP-20) ────────────────────────────────────────────────
-export const TOKEN_CONTRACT   = '0xe6B06f7C63F6AC84729007ae8910010F6E721041';
-export const TOKEN_SYMBOL     = 'AIDAG';
+export const TOKEN_CONTRACT       = '0xe6B06f7C63F6AC84729007ae8910010F6E721041';
+export const FOUNDER_LOCK_WALLET  = '0xFf01Fa9D5d1e5FCc539eFB9654523A657F32ed23'; // 3,001,000 AIDAG (deployer, 1y lock)
+export const DISTRIBUTION_WALLET  = '0xC16eC985D98Db96DE104Bf1e39E1F2Fdb9a712E9'; // 17,999,000 AIDAG (presale + community pool)
+export const DAO_IDENTITY_CONTRACT= '0x000'; // Set this to deployed DAOIdentity address
+export const PRESALE_CONTRACT     = '';      // Empty until on-chain Presale.sol is deployed
+export const TOKEN_SYMBOL         = 'AIDAG';
 export const TOKEN_NAME       = 'AIDAG Token';
 export const CHAIN_ID_BSC     = 56;
 export const MAX_SUPPLY       = 21_000_000;

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 // ── Presale configuration ─────────────────────────────────────────────────────
-const FOUNDER_WALLET    = '0x2F3b33EDAEc10e94eDFA6B59F27a4adAb6bE26aB';
+const FOUNDER_WALLET    = '0xC16eC985D98Db96DE104Bf1e39E1F2Fdb9a712E9';
 const STAGE1_PRICE_USD  = 0.078;
 const STAGE2_PRICE_USD  = 0.098;
 const LISTING_PRICE     = 0.12;

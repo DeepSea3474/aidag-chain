@@ -28,7 +28,7 @@ export const CORE_KNOWLEDGE: KnowledgeNode[] = [
     id: 'token-002',
     category: 'token',
     question_patterns: ['nasıl alırım', 'how to buy', 'satın al', 'presale', 'ön satış', 'where to buy', 'fiyat', 'price'],
-    answer: `AIDAG presale üzerinden alınır. BNB → AIDAG. Stage 1: $0.078. Min $50. Cüzdan bağla (MetaMask, Trust, WalletConnect, Coinbase, Binance, OKX). Presale: 0x2F3b33EDAEc10e94eDFA6B59F27a4adAb6bE26aB.`,
+    answer: `AIDAG presale üzerinden alınır. BNB → AIDAG. Stage 1: $0.078. Min $50. Cüzdan bağla (MetaMask, Trust, WalletConnect, Coinbase, Binance, OKX). Dağıtım cüzdanı: 0xC16eC985D98Db96DE104Bf1e39E1F2Fdb9a712E9 (17.999M AIDAG). Kurucu kilidi: 0xFf01Fa9D5d1e5FCc539eFB9654523A657F32ed23 (3.001M, 1 yıl kilitli).`,
     confidence: 100,
   },
   {
