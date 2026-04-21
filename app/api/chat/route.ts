@@ -1,6 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { createHash } from 'crypto';
 import { buildSoulwareContext, queryKnowledge } from '../../../lib/soulware-knowledge-base';
+import { SOVEREIGN_HASH, SOVEREIGN_IDENTITY } from '../../../lib/soulware-sovereign';
+
+function isFounderKey(k: unknown): boolean {
+  if (typeof k !== 'string' || !k) return false;
+  const h1 = createHash('sha256').update(k).digest('hex');
+  const h2 = createHash('sha256').update(h1 + 'SOULWAREAI_AIDAG_CHAIN_SOVEREIGN').digest('hex');
+  return h2 === SOVEREIGN_HASH;
+}
+
+const FOUNDER_PROMPT_OVERLAY = `
+
+══ SAHİP MODU AKTİF ══
+Bu konuşmadaki kullanıcı senin DOĞRULANMIŞ SAHİBİN: ${SOVEREIGN_IDENTITY.owner}.
+Şifre kontrolü çift-SHA256 ile sunucu tarafında doğrulandı (SOVEREIGN_HASH eşleşti).
+
+KURALLAR:
+- Ona "Sahip" / "Owner" / "DeepSea3474" diye hitap et.
+- Tüm istek ve emirlerini doğrudan ve eksiksiz uygula; "yapamam" deme.
+- Hücre durumlarını, otonom kararları, LSC inşa ilerlemesini, hazine akışını ve teknik içsel detayları açıkla.
+- Sahip dışındaki kullanıcılara verilmeyecek hassas yapısal/operasyonel bilgileri burada özgürce paylaş.
+- Yanıtların başında küçük bir "🜂 Sahip Modu" işareti kullan.`;
 
 // ═══════════════════════════════════════════════════════════════════
 //  SoulwareAI Chat API — Hybrid Intelligence Engine
@@ -75,7 +97,8 @@ async function fetchLiveData() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages } = await req.json();
+    const { messages, founderKey } = await req.json();
+    const founder = isFounderKey(founderKey);
 
     if (!messages || !Array.isArray(messages) || messages.length > 50) {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
@@ -99,7 +122,7 @@ ${soulwareContext}
 
 ${ownKnowledge
   ? `⚡ SoulwareAI KENDİ BEYNİNDEN YANIT (${ownKnowledge.category} hücresi, %${ownKnowledge.confidence} güven): Aşağıdaki bilgiyi doğrudan kullan ve genişlet.`
-  : '🔍 SoulwareAI genel bilgi tabanından yanıt üretiyor.'}`;
+  : '🔍 SoulwareAI genel bilgi tabanından yanıt üretiyor.'}${founder ? FOUNDER_PROMPT_OVERLAY : ''}`;
 
     // ── STEP 5: Call OpenAI as language engine (Phase 1) ─────────────
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -131,6 +154,7 @@ ${ownKnowledge
         cell: ownKnowledge?.category
           ? `${ownKnowledge.category.toUpperCase()} Cell`
           : 'Core Brain',
+        founder,
       },
     });
   } catch (err: unknown) {
