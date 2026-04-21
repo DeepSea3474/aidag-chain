@@ -215,19 +215,37 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Trust Wallet on mobile → deep link
-      if (type === 'trust' && !((window as any).ethereum?.isTrust)) {
-        const wcUri = encodeURIComponent(`wc:${REOWN_PROJECT_ID}`);
-        window.open(`trust://wc?uri=${wcUri}`, '_blank');
+      const isMobile = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+      const provider = getProvider(type) ?? (window as any).ethereum;
+
+      // Mobile + no injected provider → open the dApp inside the wallet's own browser via deep link
+      if (isMobile && !provider) {
+        const host = window.location.host;
+        const path = window.location.pathname + window.location.search;
+        const fullPath = host + path;
+        const fullUrl = window.location.href;
+
+        const deepLinks: Record<string, string> = {
+          metamask: `https://metamask.app.link/dapp/${fullPath}`,
+          trust:    `https://link.trustwallet.com/open_url?coin_id=20000714&url=${encodeURIComponent(fullUrl)}`,
+          coinbase: `https://go.cb-w.com/dapp?cb_url=${encodeURIComponent(fullUrl)}`,
+          okx:      `okx://wallet/dapp/url?dappUrl=${encodeURIComponent(fullUrl)}`,
+          binance:  `https://app.binance.com/en/download`,
+        };
+        if (deepLinks[type]) {
+          window.location.href = deepLinks[type];
+          merge({ isConnecting: false });
+          return;
+        }
+        // Fallback: WalletConnect QR
         const { openWeb3Modal } = await import('./web3modal');
         await openWeb3Modal();
         merge({ isConnecting: false });
         return;
       }
 
-      const provider = getProvider(type) ?? (window as any).ethereum;
+      // Desktop + no injected provider → install pages
       if (!provider) {
-        // Wallet not installed → guide user
         const installUrls: Record<string, string> = {
           metamask: 'https://metamask.io/download/',
           coinbase:  'https://www.coinbase.com/wallet/downloads',
