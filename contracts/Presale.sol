@@ -5,29 +5,27 @@ pragma solidity ^0.8.24;
  * AIDAG Presale Contract — BSC (BEP-20)
  *
  * Token:        0xe6B06f7C63F6AC84729007ae8910010F6E721041 (AIDAG)
- * Distribution: 0xC16eC985D98Db96DE104Bf1e39E1F2Fdb9a712E9 (holds 17.999M AIDAG)
- * Founder Lock: 0xFf01Fa9D5d1e5FCc539eFB9654523A657F32ed23 (3.001M, 1y lock)
  *
- * How it works:
- *   1. Deployer (you) deploys this contract with the AIDAG token address.
- *   2. Distribution wallet calls AIDAG.transfer(presale, 5_000_000e18) to fund it.
- *   3. Buyers call buy() with BNB → contract instantly sends them AIDAG at the
- *      current stage price. Excess BNB above hardCap is refunded.
- *   4. Owner can call withdraw() any time to pull collected BNB.
- *   5. Owner can call setStage() to switch between Stage 1 ($0.078) and
- *      Stage 2 ($0.098) prices. Listing price ($0.12) ends the presale.
- *   6. Owner can call recoverTokens() to pull leftover AIDAG after presale.
+ * Revenue split (automatic, every buy):
+ *   60%  → Founder Wallet  0xFf01Fa9D5d1e5FCc539eFB9654523A657F32ed23
+ *   40%  → DAO/Soulware    0xC16eC985D98Db96DE104Bf1e39E1F2Fdb9a712E9
  *
- * Pricing math:
- *   - Stage 1: 1 AIDAG = $0.078
- *   - We use a BNB/USD oracle-free formula by setting tokensPerBnb directly.
- *     Owner updates tokensPerBnb from the dashboard when BNB price changes.
- *     Example: If BNB = $600 and stage1 = $0.078 → tokensPerBnb = 7692
+ * AIDAG distribution:
+ *   - Distribution wallet (0xC16eC985...) transfers AIDAG into this contract
+ *     once after deploy (e.g. 5,000,000 AIDAG).
+ *   - Each buy() instantly:
+ *       1. Splits BNB 60/40 to the two wallets above
+ *       2. Sends AIDAG to the buyer at the current stage rate
+ *
+ * The contract never holds BNB — it forwards immediately. Only AIDAG sits
+ * inside until sold or recovered by owner.
+ *
+ * Owner controls: setStage, setRate, setLimits, setPaused, recoverTokens,
+ * setFounderWallet, setDaoWallet, transferOwnership.
  */
 
 interface IERC20 {
     function transfer(address to, uint256 value) external returns (bool);
-    function transferFrom(address from, address to, uint256 value) external returns (bool);
     function balanceOf(address account) external view returns (uint256);
 }
 
@@ -36,24 +34,32 @@ contract AIDAGPresale {
     address public owner;
     IERC20  public immutable token;
 
-    uint256 public tokensPerBnb;       // e.g. 7692 means 1 BNB → 7692 AIDAG
-    uint256 public minBuyWei;          // minimum BNB per buy (wei)
-    uint256 public maxBuyWei;          // maximum BNB per buy (wei, 0 = no limit)
-    uint256 public hardCapTokens;      // max AIDAG sellable in current stage (18d)
-    uint256 public soldTokens;         // total AIDAG sold so far (18d)
-    uint8   public stage;              // 1 = Stage 1, 2 = Stage 2, 0 = paused
+    address payable public founderWallet;   // 60% of BNB
+    address payable public daoWallet;       // 40% of BNB
+    uint16  public constant FOUNDER_BPS = 6000;  // 60.00%
+    uint16  public constant DAO_BPS     = 4000;  // 40.00%
+    uint16  public constant BPS_DENOM   = 10000;
+
+    uint256 public tokensPerBnb;       // e.g. 7692 → 1 BNB = 7692 AIDAG @ $0.078
+    uint256 public minBuyWei;
+    uint256 public maxBuyWei;          // 0 = no per-tx max
+    uint256 public hardCapTokens;      // max AIDAG sellable in current stage
+    uint256 public soldTokens;
+    uint8   public stage;              // 1 or 2; 0 = stopped
     bool    public paused;
 
-    mapping(address => uint256) public boughtTokens;   // per-buyer total
-    mapping(address => uint256) public boughtBnb;      // per-buyer BNB total
+    mapping(address => uint256) public boughtTokens;
+    mapping(address => uint256) public boughtBnb;
 
     // ── Events ────────────────────────────────────────────────────────
     event Bought(address indexed buyer, uint256 bnbWei, uint256 aidagAmount, uint8 stage);
+    event Split(uint256 founderShare, uint256 daoShare);
     event Refunded(address indexed buyer, uint256 bnbWei);
-    event Withdrawn(address indexed to, uint256 bnbWei);
     event TokensRecovered(address indexed to, uint256 amount);
     event StageChanged(uint8 newStage, uint256 newTokensPerBnb, uint256 newHardCap);
     event PauseChanged(bool paused);
+    event FounderWalletChanged(address indexed newWallet);
+    event DaoWalletChanged(address indexed newWallet);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     // ── Modifiers ─────────────────────────────────────────────────────
@@ -63,16 +69,18 @@ contract AIDAGPresale {
     }
 
     // ── Constructor ───────────────────────────────────────────────────
-    constructor(address _token, uint256 _tokensPerBnb, uint256 _hardCapTokens) {
-        require(_token != address(0), "Zero token");
+    constructor(uint256 _tokensPerBnb, uint256 _hardCapTokens) {
         require(_tokensPerBnb > 0, "Zero rate");
+        require(_hardCapTokens > 0, "Zero cap");
 
         owner          = msg.sender;
-        token          = IERC20(_token);
+        token          = IERC20(0xe6B06f7C63F6AC84729007ae8910010F6E721041);
+        founderWallet  = payable(0xFf01Fa9D5d1e5FCc539eFB9654523A657F32ed23);
+        daoWallet      = payable(0xC16eC985D98Db96DE104Bf1e39E1F2Fdb9a712E9);
         tokensPerBnb   = _tokensPerBnb;
         hardCapTokens  = _hardCapTokens;
-        minBuyWei      = 0.01 ether;     // ~$6 at $600 BNB; you can set higher
-        maxBuyWei      = 0;              // 0 = no per-tx max
+        minBuyWei      = 0.01 ether;
+        maxBuyWei      = 0;
         stage          = 1;
         paused         = false;
 
@@ -90,11 +98,9 @@ contract AIDAGPresale {
         require(bnbWei >= minBuyWei, "Below min");
         require(maxBuyWei == 0 || bnbWei <= maxBuyWei, "Above max");
 
-        // Compute AIDAG amount: bnbWei * tokensPerBnb (since both 18 decimals it cancels)
         uint256 aidagAmount = bnbWei * tokensPerBnb;
         require(aidagAmount > 0, "Zero amount");
 
-        // Refund overflow if would exceed hard cap
         uint256 remaining = hardCapTokens > soldTokens ? hardCapTokens - soldTokens : 0;
         require(remaining > 0, "Sold out");
 
@@ -111,8 +117,18 @@ contract AIDAGPresale {
         boughtTokens[buyer] += aidagAmount;
         boughtBnb[buyer]    += bnbWei;
 
-        // Interactions
+        // Interactions — AIDAG to buyer
         require(token.transfer(buyer, aidagAmount), "AIDAG transfer failed");
+
+        // 60/40 split — forward BNB immediately
+        uint256 founderShare = (bnbWei * FOUNDER_BPS) / BPS_DENOM;
+        uint256 daoShare     = bnbWei - founderShare;
+        (bool okF, ) = founderWallet.call{value: founderShare}("");
+        require(okF, "Founder transfer failed");
+        (bool okD, ) = daoWallet.call{value: daoShare}("");
+        require(okD, "DAO transfer failed");
+        emit Split(founderShare, daoShare);
+
         if (refund > 0) {
             (bool ok, ) = payable(buyer).call{value: refund}("");
             require(ok, "Refund failed");
@@ -148,13 +164,16 @@ contract AIDAGPresale {
         emit PauseChanged(p);
     }
 
-    function withdraw(address payable to) external onlyOwner {
-        require(to != address(0), "Zero to");
-        uint256 bal = address(this).balance;
-        require(bal > 0, "Nothing to withdraw");
-        (bool ok, ) = to.call{value: bal}("");
-        require(ok, "Withdraw failed");
-        emit Withdrawn(to, bal);
+    function setFounderWallet(address payable w) external onlyOwner {
+        require(w != address(0), "Zero");
+        founderWallet = w;
+        emit FounderWalletChanged(w);
+    }
+
+    function setDaoWallet(address payable w) external onlyOwner {
+        require(w != address(0), "Zero");
+        daoWallet = w;
+        emit DaoWalletChanged(w);
     }
 
     function recoverTokens(address to, uint256 amount) external onlyOwner {
