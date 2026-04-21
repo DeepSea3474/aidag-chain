@@ -11,7 +11,7 @@ interface NavbarProps {
 }
 
 export default function Navbar({ activePage = 'home' }: NavbarProps) {
-  const { openModal, isConnected } = useWalletContext();
+  const { openModal, isConnected, address } = useWalletContext();
   const { lang, setLang, t } = useLang();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
@@ -243,27 +243,37 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
             )}
           </div>
 
-          {/* Wallet — full button on tablet+, icon-only on mobile */}
+          {/* Wallet — full button on tablet+; on mobile show address pill when connected, icon when not */}
           <div className="hidden md:block">
             <WalletButton />
           </div>
-          <button
-            onClick={openModal}
-            aria-label={isConnected ? t('wallet_connected') : t('connect_wallet')}
-            title={isConnected ? t('wallet_connected') : t('connect_wallet')}
-            className={`md:hidden relative p-2 rounded-xl border transition-all ${
-              isConnected
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-                : 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20'
-            }`}
-          >
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            {isConnected && (
-              <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            )}
-          </button>
+          {isConnected && address ? (
+            <button
+              onClick={openModal}
+              aria-label={t('wallet_connected')}
+              title={address}
+              className="md:hidden flex items-center gap-1.5 px-2.5 py-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 transition-all hover:bg-emerald-500/15"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <span className="font-mono text-[11px] font-bold tracking-tight">
+                {address.slice(0, 5)}…{address.slice(-4)}
+              </span>
+            </button>
+          ) : (
+            <button
+              onClick={openModal}
+              aria-label={t('connect_wallet')}
+              title={t('connect_wallet')}
+              className="md:hidden relative p-2 rounded-xl border bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20 transition-all"
+            >
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </button>
+          )}
 
           {/* Mobile menu toggle */}
           <button
@@ -314,9 +324,21 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
             </Link>
             <button
               onClick={() => { setMobileOpen(false); openModal(); }}
-              className="btn btn-primary w-full py-3 rounded-xl text-sm font-bold"
+              className={`w-full py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${
+                isConnected && address
+                  ? 'bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/25'
+                  : 'btn btn-primary'
+              }`}
             >
-              {isConnected ? t('wallet_connected') : t('connect_wallet')}
+              {isConnected && address ? (
+                <>
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="font-mono text-xs tracking-wide">{address.slice(0, 6)}…{address.slice(-4)}</span>
+                  <span className="opacity-60 text-[10px] font-normal">— {t('wallet_connected')}</span>
+                </>
+              ) : (
+                t('connect_wallet')
+              )}
             </button>
           </div>
         </div>
