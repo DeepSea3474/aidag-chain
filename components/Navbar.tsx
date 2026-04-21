@@ -257,10 +257,27 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
             )}
           </div>
 
-          {/* Wallet — uses WalletContext (direct app connect, not browser tab) */}
+          {/* Wallet — full button on tablet+, icon-only on mobile */}
           <div className="hidden md:block">
             <WalletButton />
           </div>
+          <button
+            onClick={openModal}
+            aria-label={isConnected ? 'Wallet connected' : 'Connect wallet'}
+            title={isConnected ? 'Wallet connected' : 'Connect wallet'}
+            className={`md:hidden relative p-2 rounded-xl border transition-all ${
+              isConnected
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                : 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20'
+            }`}
+          >
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            {isConnected && (
+              <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            )}
+          </button>
 
           {/* Mobile menu toggle */}
           <button
