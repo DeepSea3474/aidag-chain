@@ -8,10 +8,17 @@
  *   - confirms parents reaching weight ≥ 3
  *   - measures real TPS over the iteration window
  *
+ * State is PERSISTED to disk (`.data/lsc-ledger.json`) so the ledger grows
+ * across server restarts — this is the LSC Chain Pre-Genesis Testnet Ledger
+ * that will be snapshot-migrated to mainnet at 2027 Q4 genesis.
+ *
  * Output metrics are derived from the actual DAG state, not a synthesized
  * formula. Determinism: uses a seeded LCG so every server can reproduce the
  * same chain from the same seed.
  */
+
+import fs from 'fs';
+import path from 'path';
 
 export type VertexType = 'GENESIS' | 'TX' | 'SMART_CONTRACT' | 'DAO_VOTE' | 'BRIDGE' | 'VALIDATOR';
 
@@ -44,6 +51,10 @@ export interface DagIterationResult {
   isBest: boolean;
 }
 
+const LEDGER_PATH = path.join(process.cwd(), '.data', 'lsc-ledger.json');
+const MEMORY_WINDOW = 10_000;   // keep this many most-recent vertices in memory
+const PRUNE_TRIGGER = 12_000;   // prune when we exceed this
+
 function fnv1a(str: string): number {
   let h = 2166136261 >>> 0;
   for (let i = 0; i < str.length; i++) {
@@ -68,24 +79,115 @@ class Lcg {
   next(): number { this.s = (Math.imul(this.s, 1664525) + 1013904223) >>> 0; return this.s / 0xFFFFFFFF; }
 }
 
+interface PersistedLedger {
+  version: 1;
+  genesisHash: string;
+  genesisTimestamp: number;
+  seq: number;
+  totalVerticesEver: number;
+  totalConfirmedEver: number;
+  bestRealTps: number;
+  bestFinalityMs: number;
+  vertices: DagVertex[];      // most recent MEMORY_WINDOW
+  tips: string[];
+  finalityRecords: number[];
+}
+
 export class ServerDagIterator {
   private vertices = new Map<string, DagVertex>();
   private tips = new Set<string>();
   private genesisHash: string;
+  private genesisTimestamp: number;
   private seq = 0;
   private finalityRecords: number[] = []; // time-to-confirm for each confirmed vertex
 
+  // Lifetime counters — never reset, persisted across restarts
+  private totalVerticesEver = 0;
+  private totalConfirmedEver = 0;
+  private bestRealTps = 0;
+  private bestFinalityMs = 0;
+
   constructor(seed = 'AIDAG_LSC_SERVER_DAG_2026') {
     this.genesisHash = makeHash(seed);
+    this.genesisTimestamp = Date.now();
     const genesis: DagVertex = {
       hash: this.genesisHash,
       parents: [], children: [], height: 0,
-      cumulativeWeight: 9999, timestamp: Date.now(),
+      cumulativeWeight: 9999, timestamp: this.genesisTimestamp,
       confirmed: true, type: 'GENESIS',
     };
     this.vertices.set(this.genesisHash, genesis);
     this.tips.add(this.genesisHash);
     this.seq++;
+    this.totalVerticesEver = 1;
+    this.totalConfirmedEver = 1;
+
+    this.loadFromDisk();
+  }
+
+  private loadFromDisk(): void {
+    try {
+      if (!fs.existsSync(LEDGER_PATH)) return;
+      const raw = fs.readFileSync(LEDGER_PATH, 'utf8');
+      const data = JSON.parse(raw) as PersistedLedger;
+      if (!data || data.version !== 1) return;
+
+      this.vertices.clear();
+      this.tips.clear();
+      this.genesisHash = data.genesisHash;
+      this.genesisTimestamp = data.genesisTimestamp;
+      this.seq = data.seq;
+      this.totalVerticesEver = data.totalVerticesEver;
+      this.totalConfirmedEver = data.totalConfirmedEver;
+      this.bestRealTps = data.bestRealTps || 0;
+      this.bestFinalityMs = data.bestFinalityMs || 0;
+      this.finalityRecords = Array.isArray(data.finalityRecords) ? data.finalityRecords.slice(-200) : [];
+
+      for (const v of data.vertices) {
+        this.vertices.set(v.hash, v);
+      }
+      for (const t of data.tips) {
+        if (this.vertices.has(t)) this.tips.add(t);
+      }
+      // Safety: ensure genesis always present
+      if (!this.vertices.has(this.genesisHash)) {
+        const genesis: DagVertex = {
+          hash: this.genesisHash,
+          parents: [], children: [], height: 0,
+          cumulativeWeight: 9999, timestamp: this.genesisTimestamp,
+          confirmed: true, type: 'GENESIS',
+        };
+        this.vertices.set(this.genesisHash, genesis);
+      }
+      if (this.tips.size === 0) this.tips.add(this.genesisHash);
+    } catch {
+      // Corrupt/missing file — start fresh from genesis
+    }
+  }
+
+  saveToDisk(): void {
+    try {
+      const dir = path.dirname(LEDGER_PATH);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      const data: PersistedLedger = {
+        version: 1,
+        genesisHash: this.genesisHash,
+        genesisTimestamp: this.genesisTimestamp,
+        seq: this.seq,
+        totalVerticesEver: this.totalVerticesEver,
+        totalConfirmedEver: this.totalConfirmedEver,
+        bestRealTps: this.bestRealTps,
+        bestFinalityMs: this.bestFinalityMs,
+        vertices: Array.from(this.vertices.values()),
+        tips: Array.from(this.tips),
+        finalityRecords: this.finalityRecords.slice(-200),
+      };
+      const tmp = LEDGER_PATH + '.tmp';
+      fs.writeFileSync(tmp, JSON.stringify(data));
+      fs.renameSync(tmp, LEDGER_PATH);
+    } catch {
+      // best effort — next tick will retry
+    }
   }
 
   private selectTips(rng: Lcg, count: number): string[] {
@@ -135,6 +237,7 @@ export class ServerDagIterator {
         if (p.cumulativeWeight >= 3 && !p.confirmed) {
           p.confirmed = true;
           confirmedThisRun++;
+          this.totalConfirmedEver++;
           const finalityMs = now - p.timestamp;
           if (finalityMs >= 0) confirmTimes.push(finalityMs);
         }
@@ -142,14 +245,15 @@ export class ServerDagIterator {
       this.tips.add(hash);
       this.seq++;
       createdCount++;
+      this.totalVerticesEver++;
     }
 
     // Prune to keep memory bounded — drop oldest confirmed non-tip non-genesis
-    if (this.vertices.size > 500) {
+    if (this.vertices.size > PRUNE_TRIGGER) {
       const prunable = Array.from(this.vertices.entries())
         .filter(([h, v]) => v.confirmed && !this.tips.has(h) && h !== this.genesisHash)
         .sort(([, a], [, b]) => a.timestamp - b.timestamp)
-        .slice(0, this.vertices.size - 400);
+        .slice(0, this.vertices.size - MEMORY_WINDOW);
       prunable.forEach(([h]) => this.vertices.delete(h));
     }
 
@@ -160,6 +264,12 @@ export class ServerDagIterator {
       : 0;
     this.finalityRecords.push(...confirmTimes);
     if (this.finalityRecords.length > 200) this.finalityRecords = this.finalityRecords.slice(-200);
+
+    // Lifetime bests
+    if (realTps > this.bestRealTps) this.bestRealTps = realTps;
+    if (avgFinalityMs > 0 && (this.bestFinalityMs === 0 || avgFinalityMs < this.bestFinalityMs)) {
+      this.bestFinalityMs = avgFinalityMs;
+    }
 
     const tipDiversity = parentSets.size / Math.max(1, createdCount);
     const dagHeight = Math.max(...Array.from(this.vertices.values()).map(v => v.height));
@@ -186,11 +296,36 @@ export class ServerDagIterator {
     const arr = Array.from(this.vertices.values());
     return {
       totalVertices: arr.length,
+      totalVerticesEver: this.totalVerticesEver,
+      totalConfirmedEver: this.totalConfirmedEver,
       confirmedCount: arr.filter(v => v.confirmed).length,
       tipCount: this.tips.size,
       dagHeight: Math.max(0, ...arr.map(v => v.height)),
       genesisHash: this.genesisHash,
+      genesisTimestamp: this.genesisTimestamp,
       seq: this.seq,
+      bestRealTps: this.bestRealTps,
+      bestFinalityMs: this.bestFinalityMs,
+      ageMs: Date.now() - this.genesisTimestamp,
     };
+  }
+
+  /** Explorer: return most-recent N vertices (newest first). */
+  getRecentVertices(limit = 50): DagVertex[] {
+    const arr = Array.from(this.vertices.values());
+    arr.sort((a, b) => b.timestamp - a.timestamp);
+    return arr.slice(0, Math.max(1, Math.min(limit, 500)));
+  }
+
+  /** Explorer: fetch a single vertex by hash (or null). */
+  getVertex(hash: string): DagVertex | null {
+    return this.vertices.get(hash) ?? null;
+  }
+
+  /** Explorer: tip set (current frontier of the DAG). */
+  getTips(): DagVertex[] {
+    return Array.from(this.tips)
+      .map(h => this.vertices.get(h))
+      .filter((v): v is DagVertex => !!v);
   }
 }

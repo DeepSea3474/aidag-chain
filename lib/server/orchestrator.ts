@@ -517,6 +517,8 @@ class Orchestrator {
         holdersList: Array.from(this.holders.keys()).slice(-HOLDER_LRU_CAP),
       };
       fs.writeFileSync(SNAPSHOT_PATH, JSON.stringify(out, null, 2));
+      // Also persist the LSC DAG ledger so the testnet chain survives restarts
+      this.dagIterator.saveToDisk();
     } catch (err: unknown) {
       this.recordError('snapshot.persist', err);
     }
@@ -1210,6 +1212,12 @@ class Orchestrator {
       this.state.executedHistory.length * 10
     ));
   }
+
+  // ─── Public LSC Ledger Explorer accessors ─────────────────────────────────
+  getLedgerRecent(limit = 50) { return this.dagIterator.getRecentVertices(limit); }
+  getLedgerVertex(hash: string) { return this.dagIterator.getVertex(hash); }
+  getLedgerTips() { return this.dagIterator.getTips(); }
+  getLedgerStats() { return this.dagIterator.getStats(); }
 }
 
 // ─── Singleton accessor ──────────────────────────────────────────────────────

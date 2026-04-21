@@ -315,7 +315,7 @@ export default function LSCPage() {
   const genesis = useGenesisData();
   const swState = useSoulwareState();
   const t = useT();
-  const [activeTab, setActiveTab] = useState<'monitor' | 'overview' | 'roadmap' | 'whitepaper'>('monitor');
+  const [activeTab, setActiveTab] = useState<'monitor' | 'ledger' | 'overview' | 'roadmap' | 'whitepaper'>('monitor');
 
   return (
     <div className="min-h-screen bg-[#020617] text-white overflow-x-hidden">
@@ -390,6 +390,7 @@ export default function LSCPage() {
           <div className="flex items-center gap-1 glass rounded-2xl border border-white/[0.06] p-1 flex-wrap">
             {([
               { key: 'monitor',    label: '⬡ Chain Monitor', special: true  },
+              { key: 'ledger',     label: '🔎 Ledger Explorer', special: false },
               { key: 'overview',   label: '📊 Overview',     special: false },
               { key: 'roadmap',    label: '🗺 Roadmap',      special: false },
               { key: 'whitepaper', label: '📄 Whitepaper',   special: false },
@@ -676,6 +677,9 @@ export default function LSCPage() {
 
             </div>
           )}
+
+          {/* ─── LEDGER EXPLORER TAB ─── */}
+          {activeTab === 'ledger' && <LedgerExplorerTab />}
 
           {/* ─── OVERVIEW TAB ─── */}
           {activeTab === 'overview' && (
@@ -1098,6 +1102,311 @@ export default function LSCPage() {
           </div>
         </div>
 
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LSC Ledger Explorer — real DAG vertex browser for the pre-genesis testnet
+// Data comes from /api/lsc/ledger (live SoulwareAI DAG iterator, persisted
+// to disk across restarts so the ledger genuinely grows over time).
+// ═══════════════════════════════════════════════════════════════════════════
+
+interface LedgerVertexRow {
+  hash: string;
+  parents: string[];
+  children: number;
+  height: number;
+  weight: number;
+  timestamp: number;
+  confirmed: boolean;
+  type: string;
+}
+interface LedgerStats {
+  totalVertices: number;
+  totalVerticesEver: number;
+  totalConfirmedEver: number;
+  confirmedCount: number;
+  tipCount: number;
+  dagHeight: number;
+  genesisHash: string;
+  genesisTimestamp: number;
+  seq: number;
+  bestRealTps: number;
+  bestFinalityMs: number;
+  ageMs: number;
+}
+interface LedgerResponse {
+  ok: boolean;
+  network: string;
+  phase: string;
+  mainnetTarget: string;
+  note: string;
+  stats: LedgerStats;
+  tipsCount: number;
+  tips: { hash: string; height: number; type: string; timestamp: number }[];
+  recent: LedgerVertexRow[];
+  timestamp: number;
+}
+
+function shortHash(h: string): string {
+  if (!h) return '';
+  return `${h.slice(0, 10)}…${h.slice(-8)}`;
+}
+function timeAgo(ts: number): string {
+  const s = Math.max(0, Math.floor((Date.now() - ts) / 1000));
+  if (s < 60) return `${s}s ago`;
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
+}
+function fmtDuration(ms: number): string {
+  const s = Math.floor(ms / 1000);
+  const d = Math.floor(s / 86400);
+  const h = Math.floor((s % 86400) / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  if (d > 0) return `${d}d ${h}h`;
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+function LedgerExplorerTab() {
+  const [data, setData] = useState<LedgerResponse | null>(null);
+  const [selected, setSelected] = useState<LedgerVertexRow | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    const load = async () => {
+      try {
+        const r = await fetch('/api/lsc/ledger?limit=50', { cache: 'no-store' });
+        if (!r.ok) return;
+        const j = (await r.json()) as LedgerResponse;
+        if (alive) setData(j);
+      } catch { /* keep last */ }
+    };
+    load();
+    const iv = setInterval(load, 4000);
+    return () => { alive = false; clearInterval(iv); };
+  }, []);
+
+  if (!data) {
+    return (
+      <div className="glass rounded-2xl border border-white/[0.06] p-10 text-center text-gray-500">
+        LSC ledger verisi senkronize ediliyor…
+      </div>
+    );
+  }
+
+  const s = data.stats;
+
+  return (
+    <div className="space-y-6">
+      {/* Header banner */}
+      <div className="glass rounded-2xl border border-cyan-500/20 p-6 bg-gradient-to-r from-cyan-500/[0.03] to-amber-500/[0.03]">
+        <div className="flex items-start justify-between flex-wrap gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Live · Persisted Ledger</span>
+            </div>
+            <h2 className="text-2xl font-black mb-1">LSC Chain — Pre-Genesis Testnet Ledger</h2>
+            <p className="text-sm text-gray-400 max-w-2xl">
+              SoulwareAI tarafından canlı üretilen DAG zinciri. Her vertex gerçek bir hash, parent referansları ve
+              weight-tabanlı onay mekaniğine sahiptir. Bu zincirin son snapshot&apos;ı <span className="text-amber-400 font-semibold">2027 Q4 mainnet genesis</span>&apos;ine
+              aynen aktarılacaktır — AIDAG sahipleri aldıkları 100 LSC/AIDAG&apos;i bu kayıttan alacaktır.
+            </p>
+          </div>
+          <div className="text-right">
+            <div className="text-[10px] text-gray-600 uppercase tracking-wider">Genesis</div>
+            <div className="font-mono text-xs text-cyan-400">{shortHash(s.genesisHash)}</div>
+            <div className="text-[10px] text-gray-600 mt-1">age: {fmtDuration(s.ageMs)}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+        {[
+          { label: 'Toplam Vertex', value: s.totalVerticesEver.toLocaleString(), color: 'text-cyan-400' },
+          { label: 'Onaylı', value: s.totalConfirmedEver.toLocaleString(), color: 'text-emerald-400' },
+          { label: 'DAG Height', value: `#${s.dagHeight.toLocaleString()}`, color: 'text-amber-400' },
+          { label: 'Aktif Tip', value: s.tipCount.toLocaleString(), color: 'text-pink-400' },
+          { label: 'Best TPS', value: s.bestRealTps.toLocaleString(), color: 'text-violet-400' },
+          { label: 'Best Finality', value: s.bestFinalityMs ? `${s.bestFinalityMs}ms` : '—', color: 'text-blue-400' },
+        ].map(stat => (
+          <div key={stat.label} className="glass rounded-xl border border-white/[0.06] p-4">
+            <div className={`text-lg font-black font-mono ${stat.color}`}>{stat.value}</div>
+            <div className="text-[10px] text-gray-600 uppercase tracking-wider mt-1">{stat.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Explorer table + detail panel */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        {/* Vertex list */}
+        <div className="lg:col-span-3 glass rounded-2xl border border-white/[0.06] overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06]">
+            <div className="flex items-center gap-2">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+              <span className="font-bold text-sm">Son {data.recent.length} Vertex</span>
+            </div>
+            <span className="text-[10px] text-gray-600 font-mono">auto-refresh 4s</span>
+          </div>
+          <div className="overflow-x-auto max-h-[560px] overflow-y-auto">
+            <table className="w-full text-xs">
+              <thead className="sticky top-0 bg-[#0b1020] border-b border-white/[0.06]">
+                <tr className="text-gray-500 uppercase tracking-wider text-[10px]">
+                  <th className="text-left px-4 py-2.5 font-semibold">Hash</th>
+                  <th className="text-left px-2 py-2.5 font-semibold">Height</th>
+                  <th className="text-left px-2 py-2.5 font-semibold">Type</th>
+                  <th className="text-left px-2 py-2.5 font-semibold">Weight</th>
+                  <th className="text-left px-2 py-2.5 font-semibold">Status</th>
+                  <th className="text-left px-4 py-2.5 font-semibold">Age</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.recent.map(v => (
+                  <tr
+                    key={v.hash}
+                    onClick={() => setSelected(v)}
+                    className={`border-b border-white/[0.03] cursor-pointer transition-colors ${
+                      selected?.hash === v.hash ? 'bg-cyan-500/[0.08]' : 'hover:bg-white/[0.03]'
+                    }`}
+                  >
+                    <td className="px-4 py-2.5 font-mono text-cyan-400">{shortHash(v.hash)}</td>
+                    <td className="px-2 py-2.5 font-mono text-gray-400">#{v.height}</td>
+                    <td className="px-2 py-2.5">
+                      <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${
+                        v.type === 'GENESIS'        ? 'bg-amber-500/20 text-amber-400' :
+                        v.type === 'TX'             ? 'bg-cyan-500/20 text-cyan-400' :
+                        v.type === 'SMART_CONTRACT' ? 'bg-violet-500/20 text-violet-400' :
+                        v.type === 'DAO_VOTE'       ? 'bg-pink-500/20 text-pink-400' :
+                        v.type === 'BRIDGE'         ? 'bg-emerald-500/20 text-emerald-400' :
+                        'bg-blue-500/20 text-blue-400'
+                      }`}>{v.type}</span>
+                    </td>
+                    <td className="px-2 py-2.5 font-mono text-gray-400">{v.weight}</td>
+                    <td className="px-2 py-2.5">
+                      {v.confirmed ? (
+                        <span className="text-emerald-400 font-bold">✓ Confirmed</span>
+                      ) : (
+                        <span className="text-amber-400">⏳ Pending</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2.5 text-gray-500">{timeAgo(v.timestamp)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Detail panel */}
+        <div className="lg:col-span-2 glass rounded-2xl border border-white/[0.06] p-5">
+          {selected ? (
+            <div className="space-y-4 text-sm">
+              <div>
+                <div className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Vertex Hash</div>
+                <div className="font-mono text-xs text-cyan-400 break-all">{selected.hash}</div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <div className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Height</div>
+                  <div className="font-mono font-bold">#{selected.height}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Weight</div>
+                  <div className="font-mono font-bold">{selected.weight}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Type</div>
+                  <div className="font-bold">{selected.type}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Children</div>
+                  <div className="font-mono">{selected.children}</div>
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Status</div>
+                {selected.confirmed ? (
+                  <div className="text-emerald-400 font-bold">✓ Confirmed (weight ≥ 3)</div>
+                ) : (
+                  <div className="text-amber-400">⏳ Pending confirmation</div>
+                )}
+              </div>
+              <div>
+                <div className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Timestamp</div>
+                <div className="font-mono text-xs text-gray-400">
+                  {new Date(selected.timestamp).toISOString()} ({timeAgo(selected.timestamp)})
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] text-gray-600 uppercase tracking-wider mb-2">
+                  Parents ({selected.parents.length})
+                </div>
+                <div className="space-y-1.5">
+                  {selected.parents.length === 0 ? (
+                    <div className="text-amber-400 text-xs font-bold">GENESIS VERTEX — no parents</div>
+                  ) : (
+                    selected.parents.map(p => (
+                      <button
+                        key={p}
+                        onClick={async () => {
+                          const r = await fetch(`/api/lsc/vertex/${p}`, { cache: 'no-store' });
+                          const j = await r.json();
+                          if (j.ok && j.vertex) {
+                            setSelected({
+                              hash: j.vertex.hash,
+                              parents: j.vertex.parents,
+                              children: j.vertex.childCount,
+                              height: j.vertex.height,
+                              weight: j.vertex.cumulativeWeight,
+                              timestamp: j.vertex.timestamp,
+                              confirmed: j.vertex.confirmed,
+                              type: j.vertex.type,
+                            });
+                          }
+                        }}
+                        className="block w-full text-left font-mono text-xs text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/[0.05] p-1.5 rounded transition-colors"
+                      >
+                        ↑ {shortHash(p)}
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+              <div className="pt-3 border-t border-white/[0.05]">
+                <a
+                  href={`/api/lsc/vertex/${selected.hash}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[10px] text-gray-500 hover:text-cyan-400 font-mono"
+                >
+                  → Raw JSON: /api/lsc/vertex/{shortHash(selected.hash)}
+                </a>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 py-12">
+              <div className="text-3xl mb-3">🔎</div>
+              <p className="text-sm">Tablodan bir vertex seç — parent zincirini keşfet.</p>
+              <p className="text-xs text-gray-600 mt-3">Her satır gerçek bir DAG düğümü.</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Footer note */}
+      <div className="glass rounded-xl border border-amber-500/[0.15] p-4 text-xs text-gray-500 bg-amber-500/[0.02]">
+        <span className="text-amber-400 font-bold">Not:</span> Bu ledger SoulwareAI&apos;nin {fmtDuration(s.ageMs)} boyunca
+        ürettiği gerçek DAG kayıtlarıdır. Bellekte son 10.000 vertex tutulur, tüm yaşam boyu sayaçlar
+        ({s.totalVerticesEver.toLocaleString()} toplam, {s.totalConfirmedEver.toLocaleString()} onaylı) kalıcıdır.
+        Mainnet açılışında ({data.mainnetTarget}) bu zincirin son snapshot&apos;ı LSC Chain&apos;e
+        gen&apos;esis state olarak aktarılır.
       </div>
     </div>
   );
