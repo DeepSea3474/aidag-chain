@@ -687,6 +687,85 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ══ LIVE PREVIEW CARDS — SoulwareAI Brain + DAG Chain ══ */}
+        <section className="max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-14">
+          <div className="text-center mb-6 md:mb-10">
+            <div className="section-label glass border border-emerald-500/20 text-emerald-400 mb-3 mx-auto w-fit">
+              <LiveDot /> Live Ecosystem
+            </div>
+            <h2 className="text-2xl md:text-4xl font-black tracking-tight mb-2">See SoulwareAI &amp; LSC Chain in motion</h2>
+            <p className="text-gray-500 text-sm max-w-xl mx-auto">Click either window to explore the full system.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            {/* SoulwareAI Brain preview → /soulware */}
+            <Link
+              href="/soulware"
+              className="group relative rounded-3xl overflow-hidden border border-cyan-500/20 bg-gradient-to-br from-cyan-950/30 to-[#020617] hover:border-cyan-400/50 hover:shadow-[0_0_60px_rgba(34,211,238,0.18)] transition-all"
+            >
+              <div className="relative h-[260px] sm:h-[320px] md:h-[340px]">
+                <NeuralBrain />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/50 to-transparent pointer-events-none" />
+              </div>
+              <div className="absolute top-3 left-3 flex items-center gap-2 glass-cyan rounded-lg px-2.5 py-1.5 border border-cyan-500/30">
+                <LiveDot color="cyan" />
+                <span className="text-[11px] font-bold text-cyan-400">SoulwareAI · Live Cell</span>
+              </div>
+              <div className="absolute top-3 right-3 glass rounded-lg px-2 py-1 text-[10px] font-mono text-emerald-400 border border-emerald-500/20">
+                {chain.loading ? '···' : `#${chain.blockNumber.toLocaleString()}`}
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5">
+                <div className="flex items-end justify-between gap-3">
+                  <div>
+                    <div className="text-[10px] font-bold uppercase tracking-widest text-cyan-400/70 mb-1">AIDAG Brain</div>
+                    <div className="text-base md:text-lg font-black text-white leading-tight">SoulwareAI Cell Structure</div>
+                    <div className="text-xs text-gray-400 mt-1">8 active modules · autonomous chat &amp; analysis</div>
+                  </div>
+                  <span className="flex-shrink-0 inline-flex items-center gap-1.5 text-xs font-bold text-cyan-400 group-hover:text-cyan-300 group-hover:translate-x-1 transition-all">
+                    Explore
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </Link>
+
+            {/* DAG / LSC Chain preview → /lsc */}
+            <Link
+              href="/lsc"
+              className="group relative rounded-3xl overflow-hidden border border-amber-500/20 bg-gradient-to-br from-amber-950/30 to-[#020617] hover:border-amber-400/50 hover:shadow-[0_0_60px_rgba(245,158,11,0.18)] transition-all"
+            >
+              <div className="relative h-[260px] sm:h-[320px] md:h-[340px]">
+                <DAGNetwork />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/50 to-transparent pointer-events-none" />
+              </div>
+              <div className="absolute top-3 left-3 flex items-center gap-2 glass-gold rounded-lg px-2.5 py-1.5 border border-amber-500/30">
+                <LiveDot color="amber" />
+                <span className="text-[11px] font-bold text-amber-400">LSC Chain · Live DAG</span>
+              </div>
+              <div className="absolute top-3 right-3 glass rounded-lg px-2 py-1 text-[10px] font-mono text-amber-400 border border-amber-500/20">
+                2027 Target
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5">
+                <div className="flex items-end justify-between gap-3">
+                  <div>
+                    <div className="text-[10px] font-bold uppercase tracking-widest text-amber-400/70 mb-1">LSC Coin</div>
+                    <div className="text-base md:text-lg font-black text-white leading-tight">DAG Blockchain Structure</div>
+                    <div className="text-xs text-gray-400 mt-1">100,000+ TPS · 2.1B supply · 1 AIDAG = 100 LSC</div>
+                  </div>
+                  <span className="flex-shrink-0 inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 group-hover:text-amber-300 group-hover:translate-x-1 transition-all">
+                    Explore
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </Link>
+          </div>
+        </section>
+
         {/* ══ LIVE CHAIN METRICS BAR ══ */}
         <div className="border-y border-white/[0.05] bg-black/20">
           <div className="max-w-7xl mx-auto px-6 py-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
