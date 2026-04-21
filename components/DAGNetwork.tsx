@@ -184,9 +184,6 @@ export default function DAGNetwork({ className = '' }: { className?: string }) {
         const r = v.radius * (v.type === 'GENESIS' ? pulse : 1);
         const alpha = v.alpha;
 
-        // Glow
-        const g = ctx.createRadialGradient(v.x, v.y, 0, v.x, v.y, r * 4);
-        g.addColorStop(0, v.color.replace(')', `,${alpha * 0.35})`).replace('#', 'rgba(').replace('rgba(#', 'rgba('));
         // Safe hex → rgba conversion
         const hexToRgba = (hex: string, a: number) => {
           const r2 = parseInt(hex.slice(1, 3), 16);
