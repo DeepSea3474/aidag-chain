@@ -151,8 +151,14 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
     switch (type) {
       case 'metamask':
-        if (eth.providers) return eth.providers.find((p: any) => p.isMetaMask && !p.isBraveWallet) ?? eth;
-        return eth.isMetaMask ? eth : null;
+        // Multi-provider EIP-5749: prefer MetaMask explicitly
+        if (eth.providers && Array.isArray(eth.providers)) {
+          const mm = eth.providers.find((p: any) => p.isMetaMask && !p.isBraveWallet && !p.isTrust && !p.isCoinbaseWallet && !p.isOkxWallet);
+          if (mm) return mm;
+        }
+        // Some MM builds expose detectEthereumProvider via window.ethereum directly
+        if (eth.isMetaMask && !eth.isBraveWallet && !eth.isTrust && !eth.isCoinbaseWallet) return eth;
+        return null;
       case 'coinbase':
         if (eth.providers) return eth.providers.find((p: any) => p.isCoinbaseWallet) ?? null;
         return eth.isCoinbaseWallet ? eth : null;
@@ -167,6 +173,29 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         return eth.isTrust ? eth : null;
       default:
         return eth;
+    }
+  }, []);
+
+  // ── Mobile deeplink builders (open dApp inside wallet's own browser) ──
+  const buildMobileDeeplink = useCallback((type: WalletType): string | null => {
+    if (typeof window === 'undefined') return null;
+    const host = window.location.host;
+    const path = window.location.pathname + window.location.search;
+    const fullUrl = `${host}${path}`;
+    const httpsUrl = `https://${fullUrl}`;
+    switch (type) {
+      case 'metamask':
+        return `https://metamask.app.link/dapp/${fullUrl}`;
+      case 'trust':
+        return `https://link.trustwallet.com/open_url?coin_id=20000714&url=${encodeURIComponent(httpsUrl)}`;
+      case 'coinbase':
+        return `https://go.cb-w.com/dapp?cb_url=${encodeURIComponent(httpsUrl)}`;
+      case 'okx':
+        return `okx://wallet/dapp/url?dappUrl=${encodeURIComponent(httpsUrl)}`;
+      case 'binance':
+        return `bnc://app.binance.com/cedefi/ramp-binance?url=${encodeURIComponent(httpsUrl)}`;
+      default:
+        return null;
     }
   }, []);
 
@@ -256,50 +285,73 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const isMobile = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-      const injected = getProvider(type) ?? (window as any).ethereum;
+      const specificProvider = getProvider(type);
+      const eth = (window as any).ethereum;
 
-      // Route to WalletConnect when:
-      //  • user explicitly chose WalletConnect, OR
-      //  • we're on mobile without an injected provider (regular Chrome/Safari)
-      const useWalletConnect = type === 'walletconnect' || (isMobile && !injected);
-
-      if (useWalletConnect) {
+      // ─── 1. Explicit WalletConnect choice ───
+      if (type === 'walletconnect') {
         const { connectViaWalletConnect } = await import('./web3modal');
         const result = await connectViaWalletConnect();
-        if (!result || !result.address) {
-          merge({ isConnecting: false });
+        if (!result || !result.address) { merge({ isConnecting: false }); return; }
+        const wcProvider = result.provider ?? (window as any).ethereum;
+        await finalizeConnection(wcProvider, result.address, 'walletconnect');
+        return;
+      }
+
+      // ─── 2. Specific provider found in-page (extension OR wallet's in-app browser) ───
+      if (specificProvider) {
+        const accounts: string[] = await specificProvider.request({ method: 'eth_requestAccounts' });
+        if (!accounts.length) throw new Error('No accounts returned');
+        await finalizeConnection(specificProvider, accounts[0], type);
+        return;
+      }
+
+      // ─── 3. Mobile + no injected provider → open wallet's own browser via deeplink ───
+      if (isMobile) {
+        const deeplink = buildMobileDeeplink(type);
+        if (deeplink) {
+          merge({ isConnecting: false, error: null });
+          // Use location.href so iOS/Android pass control to the wallet app
+          window.location.href = deeplink;
           return;
         }
+        // Fallback: WalletConnect QR/modal for wallets without a deeplink
+        const { connectViaWalletConnect } = await import('./web3modal');
+        const result = await connectViaWalletConnect();
+        if (!result || !result.address) { merge({ isConnecting: false }); return; }
         const wcProvider = result.provider ?? (window as any).ethereum;
-        if (!wcProvider) throw new Error('WalletConnect provider unavailable');
-        await finalizeConnection(wcProvider, result.address, type === 'walletconnect' ? 'walletconnect' : type);
+        await finalizeConnection(wcProvider, result.address, type);
         return;
       }
 
-      // Desktop + no injected provider → install pages
-      if (!injected) {
-        const installUrls: Record<string, string> = {
-          metamask: 'https://metamask.io/download/',
-          coinbase:  'https://www.coinbase.com/wallet/downloads',
-          binance:   'https://www.binance.com/en/web3wallet',
-          okx:       'https://www.okx.com/web3',
-          trust:     'https://trustwallet.com/download',
-        };
-        if (installUrls[type]) window.open(installUrls[type], '_blank');
-        merge({ isConnecting: false, error: `${type} wallet not found. Please install it.` });
-        return;
+      // ─── 4. Desktop fallbacks ───
+      // 4a. Generic injected (eth) exists but specific isn't recognised — try it
+      if (eth) {
+        try {
+          const accounts: string[] = await eth.request({ method: 'eth_requestAccounts' });
+          if (accounts.length) {
+            await finalizeConnection(eth, accounts[0], type);
+            return;
+          }
+        } catch { /* fall through to install */ }
       }
 
-      // Direct EIP-1193 (injected/extension/in-app browser)
-      const accounts: string[] = await injected.request({ method: 'eth_requestAccounts' });
-      if (!accounts.length) throw new Error('No accounts returned');
-      await finalizeConnection(injected, accounts[0], type);
+      // 4b. No extension at all → install page
+      const installUrls: Record<string, string> = {
+        metamask: 'https://metamask.io/download/',
+        coinbase: 'https://www.coinbase.com/wallet/downloads',
+        binance:  'https://www.binance.com/en/web3wallet',
+        okx:      'https://www.okx.com/web3',
+        trust:    'https://trustwallet.com/download',
+      };
+      if (installUrls[type]) window.open(installUrls[type], '_blank');
+      merge({ isConnecting: false, error: `${type} wallet not found. Please install the extension.` });
 
     } catch (err: any) {
       const msg = err?.message || 'Connection failed';
       merge({ isConnecting: false, isSigning: false, error: msg.includes('rejected') ? 'Signature rejected. Please approve to connect.' : msg });
     }
-  }, [getProvider, finalizeConnection, merge]);
+  }, [getProvider, buildMobileDeeplink, finalizeConnection, merge]);
 
   // ── Disconnect ────────────────────────────────────────────
   const disconnect = useCallback(() => {
