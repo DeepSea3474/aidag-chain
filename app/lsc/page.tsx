@@ -7,6 +7,7 @@ import { LSC_TOTAL_SUPPLY, AIDAG_TO_LSC_RATIO, MAX_SUPPLY } from '../../lib/cons
 import { useT } from '../../lib/LanguageContext';
 import Icon, { IconName } from '../../components/Icon';
 import { calcGenesisState } from '../../lib/lsc-genesis-engine';
+import GenesisHeartbeat from '../../components/GenesisHeartbeat';
 import { soulwareAI, EngineState } from '../../lib/soulware-core';
 
 const DAGNetwork = dynamic(() => import('../../components/DAGNetwork'), { ssr: false });
@@ -391,6 +392,9 @@ export default function LSCPage() {
           ═══════════════════════════════════════════════════════════ */}
           {activeTab === 'monitor' && (
             <div className="space-y-8">
+
+              {/* Live ECG heartbeat synced to BSC block production */}
+              <GenesisHeartbeat />
 
               {/* Header status bar */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
