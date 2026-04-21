@@ -9,6 +9,7 @@ import Icon from '../components/Icon';
 import PresaleWidget from '../components/PresaleWidget';
 import LiveEcosystem from '../components/LiveEcosystem';
 import EcosystemCTA from '../components/EcosystemCTA';
+import SoulwareLivePanel from '../components/SoulwareLivePanel';
 import { useChainData } from '../lib/useChainData';
 import { useLang } from '../lib/LanguageContext';
 import {
@@ -893,6 +894,16 @@ export default function Home() {
               </div>
             </div>
           </div>
+        </section>
+
+        {/* ══ SOULWARE LIVE — server-side autonomous engine ══ */}
+        <section className="max-w-7xl mx-auto px-6 py-12">
+          <div className="text-center mb-8">
+            <div className="section-label glass-cyan border border-cyan-500/20 text-cyan-400 mb-4 mx-auto w-fit">Live Autonomous Engine</div>
+            <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-2">SoulwareAI 7/24 Çalışıyor</h2>
+            <p className="text-gray-500 text-sm">Sunucu tarafında, tarayıcıdan bağımsız. Her karar gerçek zincir verisinden türetiliyor.</p>
+          </div>
+          <SoulwareLivePanel />
         </section>
 
         {/* ══ LIVE ECOSYSTEM ══ */}

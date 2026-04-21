@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import Navbar from '../../components/Navbar';
+import SoulwareLivePanel from '../../components/SoulwareLivePanel';
 import { useChainData } from '../../lib/useChainData';
 import {
   SOULWARE_IDENTITY, BRAIN_CELLS, getInitialEvents, generateEvent, getLSCMetrics,
@@ -180,6 +181,11 @@ export default function SoulwarePage() {
       <Navbar activePage="soulware" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-10">
+
+        {/* ── LIVE AUTONOMOUS ENGINE PANEL ── */}
+        <div className="mb-10">
+          <SoulwareLivePanel />
+        </div>
 
         {/* ── HERO ── */}
         <div className="relative rounded-3xl overflow-hidden glass border border-cyan-500/15 mb-10">

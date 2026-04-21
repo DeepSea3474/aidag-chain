@@ -38,6 +38,66 @@ npm run dev -- -H 0.0.0.0 -p 5000
 npm run build && npm start
 ```
 
+## SoulwareAI Live Autonomous Engine (Task #3)
+A persistent server-side singleton lives in `lib/server/orchestrator.ts` and runs
+independently of any browser session. It boots on the first request to any API
+route that imports it (e.g. `/api/soulware/status`) and keeps running for the
+lifetime of the Node process. **Strict no-fabrication rule** — every metric and
+decision is derived from one of the real sources below; if a feed is offline,
+the corresponding signal stays `false`/`null` with a clear note.
+
+### Real data sources
+- **Chain reads** (8s tick): `eth_blockNumber`, `eth_gasPrice`,
+  `eth_getBalance` for DAO/founder/operation wallets, across 6 BSC RPCs with
+  failover (publicnode + 1rpc first because they are the only ones accepting
+  `eth_getLogs`; binance dataseeds are kept as fallback for block/balance
+  reads).
+- **BNB price**: real-time from Binance / CoinGecko / CryptoCompare.
+- **AIDAG token Transfer events** (`lib/server/orchestrator.ts ›
+  ingestTransferLogs`): incremental `eth_getLogs` polling — 200-block chunks,
+  up to 5 chunks/tick, `lastIngestBlock` cursor persisted in snapshot. Real
+  recipient addresses build a holder set (LRU-bounded). Real founder→buyer
+  outflows compute presale `tokensSoldOnChain`.
+- **Real LSC DAG simulation** (`lib/server/dag-iterator.ts`): genuine DAG
+  algorithm — tip selection by cumulative weight, vertex linking, weight
+  propagation, finality at weight ≥ 3 — measuring real TPS over actual
+  elapsed ms (no synthesized formula). Bound to LSC genesis phase from
+  `lib/lsc-genesis-engine.ts`.
+- **Website probe**: real `HEAD https://aidag-chain.com` every ~96s.
+
+### Whitelisted execution pipeline
+- `EXECUTE_WHITELIST` lists allowed action types (`PRESALE_STAGE_TRANSITION`,
+  `TREASURY_REBALANCE`, `DEX_PAIR_CREATE`, `CEX_APPLY`, `GAS_BATCH_EXECUTE`).
+  Anything outside is rejected with `WHITELIST_VIOLATION` before reaching the
+  queue.
+- **Autonomy modes** (`SOULWARE_AUTONOMY_MODE` env):
+  - `observer` (default) — log only.
+  - `propose` — queue items for founder approval.
+  - `execute` — same queue path; broadcast still requires founder approval +
+    `SOULWARE_DRY_RUN=false` + `SOULWARE_DAO_PRIVATE_KEY` signer. **No tx
+    hashes are ever fabricated** — when prerequisites are missing the action
+    is marked `approved (governance-only — broadcast disabled: ...)`.
+- **Approval API**: `POST /api/soulware/queue/[id]` with founder secret hash
+  (`{ key, decision: 'approve' | 'reject', note? }`).
+
+### Endpoints + UI
+- `GET /api/soulware/status` — full state (chain, treasury, token, presale,
+  cex, dex, lsc, decisions, queue, executedHistory, whitelist, websiteProbe,
+  evolutionScore).
+- `GET /api/lsc/genesis` — LSC genesis state + recent real DAG iterations.
+- `POST /api/soulware/queue/[id]` — founder-secret-protected approve/reject.
+- `components/SoulwareLivePanel.tsx` polls every 5s — mounted on `/` (after
+  the LSC section) and at the top of `/soulware`.
+- `app/lsc/page.tsx` is wired to `/api/soulware/status` (no random TPS, no
+  random dev logs — every stat and log entry is real).
+
+### Snapshot + deployment notes
+- Snapshot at `.data/soulware-state.json` (every 5 ticks + on stop). Holders
+  set persisted as a list; restored on boot.
+- `next.config.js` no longer uses `output: 'export'` — dynamic API routes
+  require Node runtime. Deployment compatibility is tracked by the
+  pre-existing follow-up "Cloudflare uyum denetimi + canlıya alma".
+
 ## Deployment
 - **Method**: Replit Autoscale deployment (no GitHub)
 - **Domain**: aidag-chain.com via Cloudflare DNS

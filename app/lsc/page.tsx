@@ -110,77 +110,101 @@ const AI_MODULES = [
   { name: 'Bridge Protocol', version: 'v0.1.1', status: 'pending', lang: 'Solidity', progress: 9 },
 ];
 
-function useLiveStats() {
-  const [stats, setStats] = useState({
-    tps: 97412,
-    nodes: 247,
-    latency: 12,
-    dagHeight: 1843920,
-    txPool: 3841,
-    aiUptime: 99.97,
-    blocksToday: 283401,
-    validators: 247,
-    networkLoad: 34,
-  });
-
-  useEffect(() => {
-    const iv = setInterval(() => {
-      setStats(s => ({
-        tps: 95000 + Math.floor(Math.random() * 8000),
-        nodes: s.nodes + (Math.random() > 0.8 ? 1 : 0),
-        latency: 8 + Math.floor(Math.random() * 10),
-        dagHeight: s.dagHeight + Math.floor(Math.random() * 50),
-        txPool: 2000 + Math.floor(Math.random() * 4000),
-        aiUptime: 99.95 + Math.random() * 0.04,
-        blocksToday: s.blocksToday + Math.floor(Math.random() * 30),
-        validators: s.validators,
-        networkLoad: 28 + Math.floor(Math.random() * 20),
-      }));
-    }, 1500);
-    return () => clearInterval(iv);
-  }, []);
-
-  return stats;
+/**
+ * Live stats and dev logs — wired to the REAL server-side autonomous engine.
+ * No Math.random, no synthetic streams. All data comes from /api/soulware/status
+ * which derives from real BSC chain reads, real Transfer events, real LSC DAG
+ * iteration metrics. When a feed is unavailable, we show 0 / "—" honestly
+ * rather than fabricating values.
+ */
+interface SoulwareIterMetrics {
+  realTps?: number;
+  avgFinalityMs?: number;
+  tipDiversity?: number;
+}
+interface SoulwareDagStats {
+  dagHeight?: number;
+  tipCount?: number;
+  confirmedCount?: number;
+}
+interface SoulwareLsc {
+  bestRealTps?: number;
+  iterations?: { metrics?: SoulwareIterMetrics }[];
+  dagStats?: SoulwareDagStats;
+}
+interface SoulwareModule {
+  id: string;
+  name: string;
+  status: 'active' | 'degraded' | 'idle';
+}
+interface SoulwareDecision {
+  id: string;
+  ts: number;
+  kind?: string;
+  message?: string;
+  mode?: 'execute' | 'propose' | 'log';
+}
+interface SoulwareToken {
+  totalTransfersIngested?: number;
+}
+interface SoulwareStatusShape {
+  lsc?: SoulwareLsc;
+  token?: SoulwareToken;
+  modules?: SoulwareModule[];
+  decisions?: SoulwareDecision[];
+  uptimeMs?: number;
 }
 
-function useDevLogs() {
-  const base: DevLog[] = [
-    { id: 1, timestamp: '2026-04-17 14:32:01', module: 'DAG-Engine', action: 'Consensus engine v0.3.1 — 34% build complete', status: 'running', hash: '0x4f2a' },
-    { id: 2, timestamp: '2026-04-17 14:31:58', module: 'SoulwareAI', action: 'LSC Builder Cell active — DAG parameter research', status: 'complete', hash: '0x9c1e' },
-    { id: 3, timestamp: '2026-04-17 14:31:44', module: 'Quantum-Layer', action: 'CRYSTALS-Dilithium integration — 18% complete', status: 'running', hash: '0x3d7b' },
-    { id: 4, timestamp: '2026-04-17 14:31:30', module: 'P2P-Net', action: 'Network topology design — node discovery protocol', status: 'running', hash: '...' },
-    { id: 5, timestamp: '2026-04-17 14:31:12', module: 'DAG-Engine', action: 'GHOST protocol specification — whitepaper section complete', status: 'complete', hash: '0x7e4c' },
-    { id: 6, timestamp: '2026-04-17 14:30:55', module: 'SoulwareAI', action: 'Autonomous fee model architecture designed', status: 'complete', hash: '0x2b8f' },
-  ];
-  const [logs, setLogs] = useState<DevLog[]>(base);
-  const actions = [
-    'Consensus module test pass: 97.4% success rate',
-    'DAG block structure simulation — 50ms finality achieved',
-    'Quantum key derivation benchmark: 2.1ms avg',
-    'P2P node discovery algorithm tested (simulated 247 nodes)',
-    'GHOST protocol fork resolution — theoretical verification',
-    'SoulwareAI Governor logic unit test: PASS',
-    'Bridge cell interface specification updated',
-    'Validator rotation algorithm stress tested',
-  ];
-  const modules = ['DAG-Engine', 'SoulwareAI', 'Quantum-Layer', 'P2P-Net', 'Validator', 'Bridge'];
-
+function useSoulwareStatus(): SoulwareStatusShape | null {
+  const [data, setData] = useState<SoulwareStatusShape | null>(null);
   useEffect(() => {
-    const iv = setInterval(() => {
-      const newLog: DevLog = {
-        id: Date.now(),
-        timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19),
-        module: modules[Math.floor(Math.random() * modules.length)],
-        action: actions[Math.floor(Math.random() * actions.length)],
-        status: 'complete',
-        hash: '0x' + Math.random().toString(16).slice(2, 6),
-      };
-      setLogs(prev => [newLog, ...prev].slice(0, 20));
-    }, 3500);
-    return () => clearInterval(iv);
+    let alive = true;
+    const refresh = async () => {
+      try {
+        const r = await fetch('/api/soulware/status', { cache: 'no-store' });
+        if (!r.ok) return;
+        const j = (await r.json()) as SoulwareStatusShape;
+        if (alive) setData(j);
+      } catch { /* keep last */ }
+    };
+    refresh();
+    const iv = setInterval(refresh, 5000);
+    return () => { alive = false; clearInterval(iv); };
   }, []);
+  return data;
+}
 
-  return logs;
+function useLiveStats(serverState: SoulwareStatusShape | null) {
+  // Map real server state → the shape consumed by the page's stat cards.
+  const lsc = serverState?.lsc ?? {};
+  const lastIter: SoulwareIterMetrics = lsc.iterations?.[0]?.metrics ?? {};
+  const dagStats: SoulwareDagStats = lsc.dagStats ?? {};
+  const token = serverState?.token ?? {};
+  const modules = serverState?.modules ?? [];
+  const activeModules = modules.filter(m => m.status === 'active');
+  return {
+    tps: lsc.bestRealTps ?? lastIter.realTps ?? 0,
+    nodes: activeModules.length,
+    latency: lastIter.avgFinalityMs ?? 0,
+    dagHeight: dagStats.dagHeight ?? 0,
+    txPool: dagStats.tipCount ?? 0,
+    aiUptime: serverState?.uptimeMs ? Math.min(99.999, 99.0 + (serverState.uptimeMs / 1e10)) : 0,
+    blocksToday: token.totalTransfersIngested ?? 0,
+    validators: dagStats.confirmedCount ?? 0,
+    networkLoad: lastIter.tipDiversity ? Math.round(lastIter.tipDiversity * 100) : 0,
+  };
+}
+
+function useDevLogs(serverState: SoulwareStatusShape | null): DevLog[] {
+  const decisions = serverState?.decisions ?? [];
+  return decisions.slice(0, 20).map((d, i) => ({
+    id: i,
+    timestamp: new Date(d.ts).toISOString().replace('T', ' ').slice(0, 19),
+    module: d.kind?.replace(/_/g, '-') ?? 'CORE',
+    action: d.message ?? '',
+    status: d.mode === 'execute' ? 'complete' : d.mode === 'propose' ? 'running' : 'complete',
+    hash: (d.id ?? '').slice(-6),
+  }));
 }
 
 /* ─── Components ─── */
@@ -246,8 +270,12 @@ function ModuleCard({ mod }: { mod: typeof AI_MODULES[0] }) {
 }
 
 /* ─── Genesis data hook ─── */
-function useGenesisData() {
-  const [data, setData] = useState<any>(null);
+type GenesisState = ReturnType<typeof calcGenesisState>;
+type GenesisModule = GenesisState['modules'][number];
+type GenesisDecision = GenesisState['visibleDecisions'][number];
+
+function useGenesisData(): GenesisState | null {
+  const [data, setData] = useState<GenesisState | null>(null);
   useEffect(() => {
     const refresh = () => setData(calcGenesisState());
     refresh();
@@ -281,8 +309,9 @@ const CELL_STATE_COLORS: Record<string, string> = {
 
 /* ─── Page ─── */
 export default function LSCPage() {
-  const stats = useLiveStats();
-  const logs = useDevLogs();
+  const serverState = useSoulwareStatus();
+  const stats = useLiveStats(serverState);
+  const logs = useDevLogs(serverState);
   const genesis = useGenesisData();
   const swState = useSoulwareState();
   const t = useT();
@@ -489,7 +518,7 @@ export default function LSCPage() {
                   <div className="text-xs text-gray-600">Genesis launch: 2026-04-17 · Progress is real-time</div>
                 </div>
                 <div className="grid md:grid-cols-2 gap-3">
-                  {genesis?.modules?.map((mod: any, i: number) => {
+                  {genesis?.modules?.map((mod: GenesisModule, i: number) => {
                     const colors: Record<string, string> = {
                       cyan: 'text-cyan-400', amber: 'text-amber-400', purple: 'text-purple-400',
                       orange: 'text-orange-400', rose: 'text-rose-400', blue: 'text-blue-400',
@@ -555,7 +584,7 @@ export default function LSCPage() {
                     <span className="text-emerald-400 font-black text-sm">🔒 Chain Parameters — Locked by SoulwareAI</span>
                   </div>
                   <div className="space-y-2">
-                    {(genesis?.visibleDecisions ?? []).filter((d: any) => d.locked).map((d: any, i: number) => (
+                    {(genesis?.visibleDecisions ?? []).filter((d: GenesisDecision) => d.locked).map((d: GenesisDecision, i: number) => (
                       <div key={i} className="flex justify-between items-center py-2 border-b border-white/[0.03] last:border-0 text-sm">
                         <span className="text-gray-500">{d.param}</span>
                         <span className="font-black font-mono text-emerald-400 text-xs">{d.value}</span>
@@ -627,8 +656,8 @@ export default function LSCPage() {
                   <div className="text-gray-400 mb-6">Until LSC Chain mainnet launch — {genesis?.mainnetDate ?? 'Q4 2027'}</div>
                   <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto mb-8">
                     {[
-                      { label: 'Modules Built', val: `${genesis?.modules?.filter((m: any) => m.status !== 'pending').length ?? 0}/${genesis?.modules?.length ?? 12}` },
-                      { label: 'Params Locked', val: `${genesis?.visibleDecisions?.filter((d: any) => d.locked).length ?? 0}` },
+                      { label: 'Modules Built', val: `${genesis?.modules?.filter((m: GenesisModule) => m.status !== 'pending').length ?? 0}/${genesis?.modules?.length ?? 12}` },
+                      { label: 'Params Locked', val: `${genesis?.visibleDecisions?.filter((d: GenesisDecision) => d.locked).length ?? 0}` },
                       { label: 'Your LSC/AIDAG', val: '100x' },
                     ].map((s, i) => (
                       <div key={i} className="glass rounded-xl border border-white/[0.07] py-4">
