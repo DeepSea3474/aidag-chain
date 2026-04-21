@@ -1062,9 +1062,6 @@ export default function LSCPage() {
             <h2 className="text-2xl font-black mb-3">Secure Your <span className="text-gradient-gold">LSC Allocation</span></h2>
             <p className="text-gray-500 mb-6 max-w-md mx-auto text-sm">Buy AIDAG tokens now to guarantee your priority position in the 2027 LSC Chain mainnet launch.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="/#presale" className="btn btn-gold px-8 py-3.5 rounded-xl font-black">
-                Buy AIDAG → Get LSC Priority
-              </a>
               <a href="/" className="btn btn-secondary px-8 py-3.5 rounded-xl font-bold">
                 Back to Main Site
               </a>
