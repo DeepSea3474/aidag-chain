@@ -6,6 +6,7 @@ import WalletButton from '../../components/WalletButton';
 import Navbar from '../../components/Navbar';
 import { useWallet } from '../../lib/useWallet';
 import { useChainData } from '../../lib/useChainData';
+import { useT } from '../../lib/LanguageContext';
 import { TOKEN_CONTRACT, BSCSCAN_TOKEN_URL, TELEGRAM_URL, TWITTER_URL, GITHUB_URL } from '../../lib/constants';
 
 function LiveDot({ color = 'emerald' }: { color?: string }) {
@@ -137,6 +138,7 @@ const TAG_COLORS: Record<string, string> = {
 export default function DAOPage() {
   const wallet = useWallet();
   const chain = useChainData();
+  const t = useT();
 
   const [filter, setFilter] = useState<'all' | Proposal['status']>('all');
   const [selected, setSelected] = useState<Proposal | null>(null);
@@ -190,23 +192,23 @@ export default function DAOPage() {
         {/* Header */}
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-purple-500/20 text-xs font-bold text-purple-400 mb-6">
-            <LiveDot color="purple" /> SoulwareAI DAO Cell — Active
+            <LiveDot color="purple" /> {t('dao_badge')}
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight mb-4">
-            AIDAG <span className="text-gradient">DAO</span> Governance
+            {t('dao_h1_a')} <span className="text-gradient">DAO</span> {t('dao_h1_b')}
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            <span className="text-white font-bold">1 AIDAG = 1 Vote.</span> Proposals are created by token holders and executed autonomously by SoulwareAI — AIDAG Chain's own brain & cell system.
+            {t('dao_subtitle')}
           </p>
         </div>
 
         {/* Stats bar */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
           {[
-            { label: 'Total Proposals', val: PROPOSALS.length.toString(), sub: 'All time', c: 'text-white' },
-            { label: 'Active Votes', val: PROPOSALS.filter(p => p.status === 'active').length.toString(), sub: 'Open now', c: 'text-emerald-400' },
-            { label: 'Passed', val: PROPOSALS.filter(p => p.status === 'passed').length.toString(), sub: 'Executed by SoulwareAI', c: 'text-blue-400' },
-            { label: 'Governance Token', val: 'AIDAG', sub: '1 AIDAG = 1 Vote', c: 'text-cyan-400' },
+            { label: t('dao_stat_total'), val: PROPOSALS.length.toString(), sub: t('dao_stat_total_sub'), c: 'text-white' },
+            { label: t('dao_stat_active'), val: PROPOSALS.filter(p => p.status === 'active').length.toString(), sub: t('dao_stat_active_sub'), c: 'text-emerald-400' },
+            { label: t('dao_stat_passed'), val: PROPOSALS.filter(p => p.status === 'passed').length.toString(), sub: t('dao_stat_passed_sub'), c: 'text-blue-400' },
+            { label: t('dao_stat_token'), val: 'AIDAG', sub: t('dao_stat_token_sub'), c: 'text-cyan-400' },
           ].map((s, i) => (
             <div key={i} className="glass rounded-2xl border border-white/[0.06] p-5 text-center">
               <div className={`text-2xl font-black font-mono mb-1 ${s.c}`}>{s.val}</div>
@@ -220,13 +222,13 @@ export default function DAOPage() {
         <div className="glass rounded-2xl border border-purple-500/15 p-5 mb-8">
           <div className="flex items-center gap-3 flex-wrap">
             <LiveDot color="purple" />
-            <span className="font-bold text-purple-400 text-sm">SoulwareAI DAO Cell — Autonomous Execution Engine</span>
+            <span className="font-bold text-purple-400 text-sm">{t('dao_cell_title')}</span>
             <span className="glass rounded-lg px-2.5 py-1 text-[10px] text-gray-500 font-mono border border-white/[0.04]">
-              Block: #{chain.loading ? '···' : chain.blockNumber.toLocaleString()}
+              {t('dao_cell_block')}: #{chain.loading ? '···' : chain.blockNumber.toLocaleString()}
             </span>
           </div>
           <p className="text-xs text-gray-500 mt-3 leading-relaxed">
-            SoulwareAI's DAO Cell analyzes every proposal using on-chain data and autonomously executes approved decisions. This is AIDAG Chain's own autonomous intelligence — not an external AI service. All executions are transparent and verifiable on BSCScan.
+            {t('dao_cell_desc')}
           </p>
         </div>
 

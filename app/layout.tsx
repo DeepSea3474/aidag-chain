@@ -1,5 +1,6 @@
 import './globals.css';
 import { WalletProvider } from '../lib/WalletContext';
+import { LanguageProvider } from '../lib/LanguageContext';
 import WalletModal from '../components/WalletModal';
 import SoulwareBootstrap from '../components/SoulwareBootstrap';
 
@@ -23,11 +24,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className="bg-[#020617] text-white antialiased">
-        <WalletProvider>
-          <SoulwareBootstrap />
-          {children}
-          <WalletModal />
-        </WalletProvider>
+        <LanguageProvider>
+          <WalletProvider>
+            <SoulwareBootstrap />
+            {children}
+            <WalletModal />
+          </WalletProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

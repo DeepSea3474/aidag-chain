@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import Navbar from '../../components/Navbar';
 import { LSC_TOTAL_SUPPLY, AIDAG_TO_LSC_RATIO, MAX_SUPPLY } from '../../lib/constants';
+import { useT } from '../../lib/LanguageContext';
 import { calcGenesisState } from '../../lib/lsc-genesis-engine';
 import { soulwareAI, EngineState } from '../../lib/soulware-core';
 
@@ -282,6 +283,7 @@ export default function LSCPage() {
   const logs = useDevLogs();
   const genesis = useGenesisData();
   const swState = useSoulwareState();
+  const t = useT();
   const [activeTab, setActiveTab] = useState<'monitor' | 'overview' | 'roadmap' | 'whitepaper'>('monitor');
 
   return (
@@ -305,23 +307,23 @@ export default function LSCPage() {
               <div className="flex items-center gap-3 mb-3">
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold">
                   <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                  TESTNET IN DEVELOPMENT
+                  {t('lsc_badge_dev')}
                 </div>
                 <div className="px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-bold">
-                  2027 TARGET
+                  {t('lsc_badge_2027')}
                 </div>
               </div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight mb-3">
-                <span className="text-gradient-gold">LSC Chain</span><br />
-                <span className="text-white">DAG Blockchain</span>
+                <span className="text-gradient-gold">{t('lsc_h1_a')}</span><br />
+                <span className="text-white">{t('lsc_h1_b')}</span>
               </h1>
               <p className="text-gray-400 max-w-xl leading-relaxed">
-                The autonomous backbone of the AIDAG ecosystem — a Directed Acyclic Graph blockchain achieving <span className="text-amber-400 font-semibold">100,000+ TPS</span> with quantum-resistant cryptography, governed entirely by <span className="text-cyan-400 font-semibold">SoulwareAI</span>.
+                {t('lsc_desc')}
               </p>
               <div className="flex items-center gap-4 mt-5">
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="text-gray-500">AIDAG holders get</span>
-                  <span className="px-2 py-0.5 bg-amber-500/15 border border-amber-500/25 rounded-lg text-amber-400 font-bold text-xs">Priority LSC allocation</span>
+                  <span className="text-gray-500">{t('lsc_priority_label')}</span>
+                  <span className="px-2 py-0.5 bg-amber-500/15 border border-amber-500/25 rounded-lg text-amber-400 font-bold text-xs">{t('lsc_priority_val')}</span>
                 </div>
               </div>
             </div>

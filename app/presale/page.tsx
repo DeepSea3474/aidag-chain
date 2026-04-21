@@ -6,6 +6,7 @@ import WalletButton from '../../components/WalletButton';
 import Navbar from '../../components/Navbar';
 import { useWallet } from '../../lib/useWallet';
 import { useChainData } from '../../lib/useChainData';
+import { useT } from '../../lib/LanguageContext';
 import {
   TOKEN_CONTRACT, BSCSCAN_TOKEN_URL,
   PRESALE_STAGE1_PRICE, PRESALE_STAGE2_PRICE, LISTING_PRICE,
@@ -36,6 +37,7 @@ function CopyBtn({ text }: { text: string }) {
 export default function PresalePage() {
   const wallet = useWallet();
   const chain = useChainData();
+  const t = useT();
 
   const [bnbAmount, setBnbAmount] = useState('');
   const [aidagAmount, setAidagAmount] = useState('');
@@ -235,15 +237,15 @@ export default function PresalePage() {
         {/* Header */}
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-cyan-500/20 text-xs font-bold text-cyan-400 mb-6">
-            <LiveDot /> Stage 1 Presale — LIVE NOW
+            <LiveDot /> {t('presale_badge_live')}
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight mb-4">
-            Buy <span className="text-gradient">AIDAG</span> Token
+            {t('presale_h1_a')} <span className="text-gradient">AIDAG</span> {t('presale_h1_b')}
           </h1>
           <p className="text-gray-400 text-lg mb-3">
-            Stage {stats?.stage ?? 1} price: <span className="text-white font-bold">${stats?.price ?? PRESALE_STAGE1_PRICE}</span> per AIDAG
-            &nbsp;·&nbsp; Exchange listing target: <span className="text-emerald-400 font-bold">${LISTING_PRICE}</span>
-            &nbsp;·&nbsp; <span className="text-amber-400 font-bold">+{stats?.roi_from_stage1 ?? 53.8}% ROI</span>
+            {t('presale_stage_price_label')} {stats?.stage ?? 1}: <span className="text-white font-bold">${stats?.price ?? PRESALE_STAGE1_PRICE}</span> {t('presale_per_aidag')}
+            &nbsp;·&nbsp; {t('presale_listing_target')}: <span className="text-emerald-400 font-bold">${LISTING_PRICE}</span>
+            &nbsp;·&nbsp; <span className="text-amber-400 font-bold">+{stats?.roi_from_stage1 ?? 53.8}% {t('presale_roi_suffix')}</span>
           </p>
           <p className="text-gray-600 text-sm">
             Contract:{' '}

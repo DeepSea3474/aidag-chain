@@ -4,19 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import WalletButton from './WalletButton';
 import { useWalletContext } from '../lib/WalletContext';
-
-const LANGUAGES = [
-  { code: 'en', flag: '🇬🇧', name: 'English' },
-  { code: 'tr', flag: '🇹🇷', name: 'Türkçe' },
-  { code: 'de', flag: '🇩🇪', name: 'Deutsch' },
-  { code: 'fr', flag: '🇫🇷', name: 'Français' },
-  { code: 'es', flag: '🇪🇸', name: 'Español' },
-  { code: 'pt', flag: '🇧🇷', name: 'Português' },
-  { code: 'ru', flag: '🇷🇺', name: 'Русский' },
-  { code: 'zh', flag: '🇨🇳', name: '中文' },
-  { code: 'ar', flag: '🇸🇦', name: 'العربية' },
-  { code: 'ja', flag: '🇯🇵', name: '日本語' },
-];
+import { useLang, LANGS, LangCode } from '../lib/LanguageContext';
 
 interface NavbarProps {
   activePage?: 'home' | 'lsc' | 'dao' | 'presale' | 'soulware' | 'docs';
@@ -24,9 +12,9 @@ interface NavbarProps {
 
 export default function Navbar({ activePage = 'home' }: NavbarProps) {
   const { openModal, isConnected } = useWalletContext();
+  const { lang, setLang, t } = useLang();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
-  const [lang, setLang] = useState('en');
   const [scrolled, setScrolled] = useState(false);
   const [lscOpen, setLscOpen] = useState(false);
   const langRef = useRef<HTMLDivElement>(null);
@@ -39,13 +27,6 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
   }, []);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('aidag_lang');
-      if (saved) setLang(saved);
-    } catch {}
-  }, []);
-
-  useEffect(() => {
     const close = (e: MouseEvent) => {
       if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false);
       if (lscRef.current && !lscRef.current.contains(e.target as Node)) setLscOpen(false);
@@ -54,20 +35,18 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
     return () => document.removeEventListener('mousedown', close);
   }, []);
 
-  const changeLang = (code: string) => {
+  const changeLang = (code: LangCode) => {
     setLang(code);
     setLangOpen(false);
-    try { localStorage.setItem('aidag_lang', code); } catch {}
-    window.dispatchEvent(new CustomEvent('aidag-lang-change', { detail: code }));
   };
 
-  const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
+  const currentLang = LANGS.find(l => l.code === lang) || LANGS[0];
 
   const navItems = [
-    { label: 'Home',     href: '/',         key: 'home',     icon: '◇' },
-    { label: 'Presale',  href: '/presale',  key: 'presale',  icon: '◈', accent: 'green' },
-    { label: 'DAO',      href: '/dao',      key: 'dao',      icon: '⬢', accent: 'purple' },
-    { label: 'SoulwareAI', href: '/soulware', key: 'soulware', icon: '◉', accent: 'cyan' },
+    { label: t('nav_home'),     href: '/',         key: 'home',     icon: '◇' },
+    { label: t('nav_presale'),  href: '/presale',  key: 'presale',  icon: '◈', accent: 'green' },
+    { label: t('nav_dao'),      href: '/dao',      key: 'dao',      icon: '⬢', accent: 'purple' },
+    { label: t('nav_soulware'), href: '/soulware', key: 'soulware', icon: '◉', accent: 'cyan' },
   ];
 
   return (
@@ -217,8 +196,8 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
             <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span className="hidden md:inline">Buy AIDAG</span>
-            <span className="md:hidden">Buy</span>
+            <span className="hidden md:inline">{t('nav_buy')}</span>
+            <span className="md:hidden">{t('nav_buy_short')}</span>
             <span className="hidden lg:inline text-[9px] bg-white/20 px-1 py-0.5 rounded ml-0.5">$0.078</span>
           </Link>
 
@@ -227,7 +206,7 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
             <button
               onClick={() => setLangOpen(!langOpen)}
               className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/[0.05] transition-all border border-white/[0.06] hover:border-white/[0.12]"
-              title="Change language"
+              title={t('nav_change_lang')}
             >
               <span className="text-base leading-none">{currentLang.flag}</span>
               <span className="hidden sm:block text-[11px] font-bold">{currentLang.code.toUpperCase()}</span>
@@ -238,10 +217,10 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
 
             {langOpen && (
               <div className="absolute top-full right-0 mt-2 w-44 glass rounded-2xl border border-white/[0.08] shadow-2xl p-1.5 z-50">
-                {LANGUAGES.map(l => (
+                {LANGS.map(l => (
                   <button
                     key={l.code}
-                    onClick={() => changeLang(l.code)}
+                    onClick={() => changeLang(l.code as LangCode)}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm transition-all ${
                       lang === l.code
                         ? 'bg-cyan-500/15 text-cyan-400'
@@ -263,8 +242,8 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
           </div>
           <button
             onClick={openModal}
-            aria-label={isConnected ? 'Wallet connected' : 'Connect wallet'}
-            title={isConnected ? 'Wallet connected' : 'Connect wallet'}
+            aria-label={isConnected ? t('wallet_connected') : t('connect_wallet')}
+            title={isConnected ? t('wallet_connected') : t('connect_wallet')}
             className={`md:hidden relative p-2 rounded-xl border transition-all ${
               isConnected
                 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
@@ -313,24 +292,24 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
 
           <Link href="/lsc" onClick={() => setMobileOpen(false)} className="px-4 py-3 rounded-xl flex items-center gap-3 text-amber-400 hover:bg-amber-500/10 transition-all text-sm font-bold">
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-            ⬡ LSC Chain Dashboard
+            ⬡ {t('lsc_dashboard')}
             <span className="ml-auto text-[10px] bg-amber-500 text-black px-1.5 py-0.5 rounded-full font-bold">2027</span>
           </Link>
 
           <div className="border-t border-white/[0.05] mt-2 pt-3 space-y-2">
             <Link href="/presale" onClick={() => setMobileOpen(false)}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg shadow-emerald-500/30">
-              💰 Buy AIDAG — $0.078
+              💰 {t('nav_buy')} — $0.078
             </Link>
             <Link href="/dao" onClick={() => setMobileOpen(false)}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold border border-purple-500/30 text-purple-300 bg-purple-500/10 hover:bg-purple-500/20">
-              ⬢ Become DAO Member
+              ⬢ {t('nav_dao')}
             </Link>
             <button
               onClick={() => { setMobileOpen(false); openModal(); }}
               className="btn btn-primary w-full py-3 rounded-xl text-sm font-bold"
             >
-              {isConnected ? 'Wallet Connected' : 'Connect Wallet'}
+              {isConnected ? t('wallet_connected') : t('connect_wallet')}
             </button>
           </div>
         </div>

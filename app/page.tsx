@@ -9,6 +9,7 @@ import PresaleWidget from '../components/PresaleWidget';
 import LiveEcosystem from '../components/LiveEcosystem';
 import EcosystemCTA from '../components/EcosystemCTA';
 import { useChainData } from '../lib/useChainData';
+import { useLang } from '../lib/LanguageContext';
 import {
   TOKEN_CONTRACT, BSCSCAN_TOKEN_URL, GITHUB_URL, TELEGRAM_URL, TWITTER_URL,
   PRESALE_STAGE1_PRICE, PRESALE_STAGE2_PRICE, LISTING_PRICE,
@@ -380,33 +381,19 @@ function LiveDot({ color = 'emerald' }: { color?: string }) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function Home() {
   const chain = useChainData();
-  const [lang, setLang] = useState<LangCode>('en');
+  const { lang } = useLang();
   const [langOpen, setLangOpen] = useState(false);
   const [lscOpen, setLscOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [scrolled, setScrolled] = useState(false);
-  const t = T[lang];
-  const currentLang = LANGS.find(l => l.code === lang)!;
+  const t = T[lang as LangCode] ?? T.en;
+  const currentLang = LANGS.find(l => l.code === lang) ?? LANGS[0];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  // Sync with global Navbar language switcher (aidag-lang-change event + localStorage)
-  useEffect(() => {
-    try {
-      const stored = (typeof window !== 'undefined' && localStorage.getItem('aidag_lang')) as LangCode | null;
-      if (stored && T[stored]) setLang(stored);
-    } catch {}
-    const onLang = (e: Event) => {
-      const code = (e as CustomEvent).detail?.lang as LangCode | undefined;
-      if (code && T[code]) setLang(code);
-    };
-    window.addEventListener('aidag-lang-change', onLang as EventListener);
-    return () => window.removeEventListener('aidag-lang-change', onLang as EventListener);
   }, []);
 
   const navLinks = [

@@ -10,6 +10,7 @@ import {
   type SoulwareBrainEvent, type LSCMetrics,
 } from '../../lib/soulware-engine';
 import { GITHUB_URL, TELEGRAM_URL, TOKEN_CONTRACT } from '../../lib/constants';
+import { useT } from '../../lib/LanguageContext';
 
 function LiveDot({ color = 'emerald', size = 'sm' }: { color?: string; size?: 'xs' | 'sm' | 'md' }) {
   const s = size === 'xs' ? 'w-1.5 h-1.5' : size === 'md' ? 'w-3 h-3' : 'w-2 h-2';
@@ -140,6 +141,7 @@ function MiniNeuralCanvas() {
 // ══════════════════════════════════════════════════════════════════════════════
 export default function SoulwarePage() {
   const chain = useChainData();
+  const t = useT();
 
   const [events, setEvents] = useState<SoulwareBrainEvent[]>(() => getInitialEvents(12));
   const [lsc, setLsc] = useState<LSCMetrics>(() => getLSCMetrics());
@@ -190,30 +192,29 @@ export default function SoulwarePage() {
               {/* Identity badge */}
               <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full glass border border-cyan-500/25 text-xs font-black text-cyan-400 mb-8">
                 <LiveDot />
-                SoulwareAI — AUTONOMOUS · LIVE
+                {t('sw_badge_active')}
               </div>
 
               <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-black tracking-tight leading-[1.05] mb-5">
                 <span className="text-shimmer">SoulwareAI</span>
                 <br />
-                <span className="text-white text-2xl sm:text-3xl md:text-4xl font-black">The Brain of AIDAG Chain</span>
+                <span className="text-white text-2xl sm:text-3xl md:text-4xl font-black">{t('sw_h1_b')}</span>
               </h1>
 
               <p className="text-gray-400 text-base leading-relaxed mb-6 max-w-lg">
-                SoulwareAI is the <span className="text-white font-bold">proprietary brain & cell system</span> built exclusively into AIDAG Chain.
-                Owned solely by <span className="text-cyan-400 font-bold">AIDAG Chain</span> and its founder <span className="text-cyan-400 font-bold">DeepSea3474</span>.
+                {t('sw_desc')}
               </p>
 
               {/* Identity declarations */}
               <div className="glass rounded-2xl border border-white/[0.06] p-5 mb-6 space-y-3">
-                <div className="text-xs font-black text-gray-500 uppercase tracking-widest mb-3">Identity Declaration</div>
+                <div className="text-xs font-black text-gray-500 uppercase tracking-widest mb-3">{t('sw_id_decl')}</div>
                 {[
-                  { label: 'Owner', val: 'AIDAG Chain & DeepSea3474 ONLY', c: 'text-cyan-400', ok: true },
-                  { label: 'Architecture', val: 'Brain & Cell Autonomous DAG Loop', c: 'text-purple-400', ok: true },
-                  { label: 'External AI?', val: 'NO — Zero external AI affiliation', c: 'text-emerald-400', ok: true },
-                  { label: 'OpenAI / GPT?', val: 'NO — Completely independent', c: 'text-emerald-400', ok: true },
-                  { label: 'Anthropic / Claude?', val: 'NO — No third-party dependency', c: 'text-emerald-400', ok: true },
-                  { label: 'Purpose', val: 'Governs AIDAG Chain & builds LSC DAG Chain', c: 'text-amber-400', ok: true },
+                  { label: t('sw_id_owner'), val: t('sw_id_owner_val'), c: 'text-cyan-400', ok: true },
+                  { label: t('sw_id_arch'), val: t('sw_id_arch_val'), c: 'text-purple-400', ok: true },
+                  { label: t('sw_id_external'), val: t('sw_id_external_val'), c: 'text-emerald-400', ok: true },
+                  { label: t('sw_id_openai'), val: t('sw_id_openai_val'), c: 'text-emerald-400', ok: true },
+                  { label: t('sw_id_anthropic'), val: t('sw_id_anthropic_val'), c: 'text-emerald-400', ok: true },
+                  { label: t('sw_id_purpose'), val: t('sw_id_purpose_val'), c: 'text-amber-400', ok: true },
                 ].map((r, i) => (
                   <div key={i} className="flex items-center justify-between gap-4">
                     <span className="text-xs text-gray-500">{r.label}</span>
