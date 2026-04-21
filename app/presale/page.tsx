@@ -245,7 +245,13 @@ export default function PresalePage() {
             &nbsp;·&nbsp; Exchange listing target: <span className="text-emerald-400 font-bold">${LISTING_PRICE}</span>
             &nbsp;·&nbsp; <span className="text-amber-400 font-bold">+{stats?.roi_from_stage1 ?? 53.8}% ROI</span>
           </p>
-          <p className="text-gray-600 text-sm">Contract: <a href={BSCSCAN_TOKEN_URL} target="_blank" rel="noopener noreferrer" className="font-mono text-cyan-400 hover:text-cyan-300">{TOKEN_CONTRACT}</a></p>
+          <p className="text-gray-600 text-sm">
+            Contract:{' '}
+            <a href={BSCSCAN_TOKEN_URL} target="_blank" rel="noopener noreferrer" className="font-mono text-cyan-400 hover:text-cyan-300 break-all">
+              <span className="hidden sm:inline">{TOKEN_CONTRACT}</span>
+              <span className="sm:hidden">{TOKEN_CONTRACT.slice(0, 10)}…{TOKEN_CONTRACT.slice(-8)}</span>
+            </a>
+          </p>
         </div>
 
         {/* ── Live Presale Progress ─────────────────────────────────────────── */}
@@ -667,7 +673,10 @@ export default function PresalePage() {
             <div className="glass rounded-2xl border border-white/[0.07] p-5">
               <h3 className="font-bold text-sm mb-3 text-gray-300">Token Contract</h3>
               <div className="flex items-center gap-2 mb-3">
-                <span className="font-mono text-[11px] text-cyan-400 break-all flex-1">{TOKEN_CONTRACT}</span>
+                <span className="font-mono text-[11px] text-cyan-400 break-all flex-1 min-w-0">
+                  <span className="hidden sm:inline">{TOKEN_CONTRACT}</span>
+                  <span className="sm:hidden">{TOKEN_CONTRACT.slice(0, 10)}…{TOKEN_CONTRACT.slice(-8)}</span>
+                </span>
                 <CopyBtn text={TOKEN_CONTRACT} />
               </div>
               <a href={BSCSCAN_TOKEN_URL} target="_blank" rel="noopener noreferrer"

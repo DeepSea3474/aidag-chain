@@ -570,8 +570,12 @@ export default function SoulwarePage() {
             <span className="text-gray-600">— Exclusively owned by AIDAG Chain & DeepSea3474</span>
           </div>
           <p className="text-xs text-gray-700">
-            Contract: <a href={`https://bscscan.com/token/${TOKEN_CONTRACT}`} target="_blank" rel="noopener noreferrer"
-              className="font-mono text-cyan-700 hover:text-cyan-500 transition-colors">{TOKEN_CONTRACT}</a>
+            Contract:{' '}
+            <a href={`https://bscscan.com/token/${TOKEN_CONTRACT}`} target="_blank" rel="noopener noreferrer"
+              className="font-mono text-cyan-700 hover:text-cyan-500 transition-colors break-all">
+              <span className="hidden sm:inline">{TOKEN_CONTRACT}</span>
+              <span className="sm:hidden">{TOKEN_CONTRACT.slice(0, 10)}…{TOKEN_CONTRACT.slice(-8)}</span>
+            </a>
           </p>
         </div>
       </div>

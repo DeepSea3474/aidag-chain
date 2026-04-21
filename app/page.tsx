@@ -648,14 +648,14 @@ export default function Home() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 mb-9 sm:mb-10">
-              <Link href="/presale" className="btn btn-primary px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-black text-white justify-center">
+              <Link href="/presale" className="btn btn-primary w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-black text-white justify-center">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 {t.hero_buy}
               </Link>
-              <WalletButton className="px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base justify-center" />
-              <Link href="/lsc" className="btn btn-gold px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-bold justify-center">
+              <WalletButton className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base justify-center" />
+              <Link href="/lsc" className="btn btn-gold w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-bold justify-center">
                 ⬡ {t.hero_lsc}
               </Link>
             </div>
