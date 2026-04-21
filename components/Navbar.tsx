@@ -83,7 +83,7 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
       </div>
 
       {/* Main nav */}
-      <div className="px-3 sm:px-4 md:px-6 py-3 flex items-center justify-between gap-2 sm:gap-4">
+      <div className="px-2 sm:px-4 md:px-6 py-3 flex items-center justify-between gap-1.5 sm:gap-4">
         {/* ═══ Logo: AIDAG (navy gradient) CHAIN (white) with quantum glow ═══ */}
         <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group min-w-0">
           <div className="relative shrink-0">
@@ -255,14 +255,14 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
               onClick={openModal}
               aria-label={t('wallet_connected')}
               title={address}
-              className="md:hidden flex items-center gap-1.5 px-2.5 py-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 transition-all hover:bg-emerald-500/15"
+              className="md:hidden flex items-center gap-1 px-2 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 transition-all hover:bg-emerald-500/15"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
-              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
-              <span className="font-mono text-[11px] font-bold tracking-tight">
-                {address.slice(0, 5)}…{address.slice(-4)}
+              <span className="font-mono text-[10px] font-bold tracking-tight">
+                {address.slice(0, 4)}…{address.slice(-3)}
               </span>
             </button>
           ) : (
@@ -270,25 +270,27 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
               onClick={openModal}
               aria-label={t('connect_wallet')}
               title={t('connect_wallet')}
-              className="md:hidden relative p-2 rounded-xl border bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20 transition-all"
+              className="md:hidden flex items-center gap-1 px-2 py-1.5 rounded-lg border bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20 transition-all"
             >
-              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
+              <span className="text-[10px] font-bold uppercase tracking-wide">Wallet</span>
             </button>
           )}
 
-          {/* Mobile menu toggle */}
+          {/* Mobile menu toggle — always visible on mobile, compact */}
           <button
-            className="lg:hidden relative p-2 rounded-xl text-white bg-white/[0.04] border border-white/[0.08] hover:bg-cyan-500/10 hover:border-cyan-500/30 transition-all"
+            className="lg:hidden flex-shrink-0 flex items-center gap-1 px-2 py-1.5 rounded-lg text-white bg-white/[0.04] border border-white/[0.08] hover:bg-cyan-500/10 hover:border-cyan-500/30 transition-all"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Menu"
           >
-            <div className="w-5 h-4 flex flex-col justify-between">
-              <span className={`block h-0.5 bg-current rounded-full transition-all duration-300 ${mobileOpen ? 'rotate-45 translate-y-[7px]' : ''}`} />
+            <div className="w-4 h-3.5 flex flex-col justify-between">
+              <span className={`block h-0.5 bg-current rounded-full transition-all duration-300 ${mobileOpen ? 'rotate-45 translate-y-[6px]' : ''}`} />
               <span className={`block h-0.5 bg-current rounded-full transition-all duration-300 ${mobileOpen ? 'opacity-0' : ''}`} />
-              <span className={`block h-0.5 bg-current rounded-full transition-all duration-300 ${mobileOpen ? '-rotate-45 -translate-y-[7px]' : ''}`} />
+              <span className={`block h-0.5 bg-current rounded-full transition-all duration-300 ${mobileOpen ? '-rotate-45 -translate-y-[6px]' : ''}`} />
             </div>
+            <span className="text-[10px] font-bold uppercase tracking-wide">Menu</span>
           </button>
         </div>
       </div>
