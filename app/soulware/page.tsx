@@ -2,7 +2,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
-import WalletButton from '../../components/WalletButton';
 import Navbar from '../../components/Navbar';
 import { useChainData } from '../../lib/useChainData';
 import {

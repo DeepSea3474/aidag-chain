@@ -2,7 +2,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
-import WalletButton from '../../components/WalletButton';
 import Navbar from '../../components/Navbar';
 import { useWallet } from '../../lib/useWallet';
 import { useChainData } from '../../lib/useChainData';
@@ -260,12 +259,7 @@ export default function DAOPage() {
                   <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
                   Create New Proposal
                 </h3>
-                {!wallet.isConnected ? (
-                  <div className="text-center py-4">
-                    <p className="text-gray-400 text-sm mb-4">Connect your wallet to create a proposal</p>
-                    <WalletButton />
-                  </div>
-                ) : (
+                {(
                   <form onSubmit={handleCreateProposal} className="space-y-4">
                     <div>
                       <label className="text-xs font-bold text-gray-500 mb-2 block">Proposal Title</label>
@@ -403,33 +397,24 @@ export default function DAOPage() {
                               ✓ You voted <span className="capitalize">{myVote}</span> on {p.id}
                             </div>
                           ) : (
-                            <>
-                              {!wallet.isConnected ? (
-                                <div className="text-center">
-                                  <p className="text-xs text-gray-500 mb-2">Connect wallet to vote</p>
-                                  <WalletButton className="mx-auto" />
-                                </div>
-                              ) : (
-                                <div className="flex gap-2">
-                                  {(['for', 'abstain', 'against'] as VoteChoice[]).map(choice => (
-                                    <button key={choice}
-                                      disabled={submitting === p.id}
-                                      onClick={() => handleVote(p.id, choice)}
-                                      className={`flex-1 py-2.5 rounded-xl text-xs font-bold border transition-all capitalize flex items-center justify-center gap-1.5 ${
-                                        choice === 'for'     ? 'glass border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/15' :
-                                        choice === 'against' ? 'glass border-red-500/30 text-red-400 hover:bg-red-500/15' :
-                                                               'glass border-gray-500/30 text-gray-400 hover:bg-white/[0.05]'
-                                      } ${submitting === p.id ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                                      {submitting === p.id
-                                        ? <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-                                        : choice === 'for' ? '✓' : choice === 'against' ? '✕' : '—'
-                                      }
-                                      {choice}
-                                    </button>
-                                  ))}
-                                </div>
-                              )}
-                            </>
+                            <div className="flex gap-2">
+                              {(['for', 'abstain', 'against'] as VoteChoice[]).map(choice => (
+                                <button key={choice}
+                                  disabled={submitting === p.id}
+                                  onClick={() => handleVote(p.id, choice)}
+                                  className={`flex-1 py-2.5 rounded-xl text-xs font-bold border transition-all capitalize flex items-center justify-center gap-1.5 ${
+                                    choice === 'for'     ? 'glass border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/15' :
+                                    choice === 'against' ? 'glass border-red-500/30 text-red-400 hover:bg-red-500/15' :
+                                                           'glass border-gray-500/30 text-gray-400 hover:bg-white/[0.05]'
+                                  } ${submitting === p.id ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                  {submitting === p.id
+                                    ? <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                                    : choice === 'for' ? '✓' : choice === 'against' ? '✕' : '—'
+                                  }
+                                  {!wallet.isConnected && choice === 'for' ? 'Vote' : choice}
+                                </button>
+                              ))}
+                            </div>
                           )}
                         </div>
                       )}
@@ -456,8 +441,7 @@ export default function DAOPage() {
               </h3>
               {!wallet.isConnected ? (
                 <div className="text-center py-4">
-                  <p className="text-xs text-gray-500 mb-3">Connect to see your voting power</p>
-                  <WalletButton className="w-full justify-center" />
+                  <p className="text-xs text-gray-500">Connect your wallet from the top right to see your voting power.</p>
                 </div>
               ) : (
                 <div className="space-y-3">

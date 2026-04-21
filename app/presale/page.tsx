@@ -2,7 +2,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useCallback } from 'react';
-import WalletButton from '../../components/WalletButton';
 import Navbar from '../../components/Navbar';
 import { useWallet } from '../../lib/useWallet';
 import { useChainData } from '../../lib/useChainData';
@@ -372,15 +371,19 @@ export default function PresalePage() {
 
                 {/* Wallet status */}
                 {!wallet.isConnected ? (
-                  <div className="glass rounded-2xl border border-cyan-500/20 p-5 flex flex-col items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => wallet.openModal()}
+                    className="w-full glass rounded-2xl border border-cyan-500/30 hover:border-cyan-400/50 p-5 flex flex-col items-center gap-3 transition-all hover:bg-cyan-500/[0.04]"
+                  >
                     <div className="w-12 h-12 rounded-full glass-cyan border border-cyan-500/30 flex items-center justify-center">
                       <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
                     </div>
-                    <p className="text-sm text-gray-400 text-center">Connect your wallet to continue</p>
-                    <WalletButton className="w-full justify-center" />
-                  </div>
+                    <p className="text-sm font-bold text-cyan-400">Tap here to connect your wallet</p>
+                    <p className="text-[10px] text-gray-500 text-center">One-time connection — works on every page</p>
+                  </button>
                 ) : isWrongChain ? (
                   <div className="glass rounded-2xl border border-red-500/30 p-4 flex items-center gap-3">
                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} className="text-red-400 flex-shrink-0">
@@ -391,7 +394,7 @@ export default function PresalePage() {
                       <div className="text-xs text-gray-500">Please switch to BSC (Chain ID: 56)</div>
                     </div>
                     <button
-                      onClick={() => { const e = (window as any).ethereum; e?.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] }); }}
+                      onClick={() => wallet.switchToBSC()}
                       className="ml-auto btn btn-primary px-4 py-2 rounded-xl text-xs font-bold">Switch</button>
                   </div>
                 ) : (
