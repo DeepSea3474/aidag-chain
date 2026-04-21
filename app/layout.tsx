@@ -24,6 +24,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className="bg-[#020617] text-white antialiased">
+        <div id="__err_overlay" style={{display:'none',position:'fixed',top:0,left:0,right:0,zIndex:99999,background:'#dc2626',color:'#fff',padding:'12px 16px',fontFamily:'monospace',fontSize:'12px',whiteSpace:'pre-wrap',maxHeight:'50vh',overflow:'auto'}}></div>
+        <script dangerouslySetInnerHTML={{__html:`
+          (function(){
+            var box=document.getElementById('__err_overlay');
+            function show(m){if(!box)return;box.style.display='block';box.textContent=(box.textContent?box.textContent+'\\n---\\n':'')+m;}
+            window.addEventListener('error',function(e){show('ERROR: '+(e.message||'')+' @ '+(e.filename||'')+':'+(e.lineno||'')+'\\n'+(e.error&&e.error.stack||''));});
+            window.addEventListener('unhandledrejection',function(e){show('PROMISE: '+(e.reason&&(e.reason.stack||e.reason.message)||String(e.reason)));});
+          })();
+        `}} />
         <LanguageProvider>
           <WalletProvider>
             <SoulwareBootstrap />
