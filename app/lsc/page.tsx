@@ -296,7 +296,7 @@ export default function LSCPage() {
 
       <Navbar activePage="lsc" />
 
-      <div className="relative z-10 pt-[105px]">
+      <div className="relative z-10">
 
         {/* ─── Hero Banner ─── */}
         <div className="border-b border-amber-500/[0.08] bg-gradient-to-r from-amber-500/[0.04] via-transparent to-purple-500/[0.04]">
@@ -311,7 +311,7 @@ export default function LSCPage() {
                   2027 TARGET
                 </div>
               </div>
-              <h1 className="text-4xl md:text-5xl font-black tracking-tight leading-tight mb-3">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight mb-3">
                 <span className="text-gradient-gold">LSC Chain</span><br />
                 <span className="text-white">DAG Blockchain</span>
               </h1>

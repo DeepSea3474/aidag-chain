@@ -307,7 +307,7 @@ body {
 
 /* Push body content below fixed navbar (top bar 28px + main 64px ≈ 92px) */
 body { padding-top: 92px; }
-@media (max-width: 768px) { body { padding-top: 64px; } }
+@media (max-width: 767px) { body { padding-top: 60px; } }
 
 /* ═══ AIDAG CHAIN brand wordmark ═══ */
 @keyframes aidag-shimmer {
@@ -351,6 +351,9 @@ body { padding-top: 92px; }
   height: 1px;
   background: linear-gradient(90deg, transparent, #06b6d4, transparent);
   opacity: 0.6;
+}
+@media (max-width: 640px) {
+  .chain-brand::after { display: none; }
 }
 
 /* ─── Section labels ─── */

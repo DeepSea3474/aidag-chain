@@ -192,7 +192,7 @@ export default function DAOPage() {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-purple-500/20 text-xs font-bold text-purple-400 mb-6">
             <LiveDot color="purple" /> SoulwareAI DAO Cell — Active
           </div>
-          <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-4">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight mb-4">
             AIDAG <span className="text-gradient">DAO</span> Governance
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">

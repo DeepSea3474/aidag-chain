@@ -613,28 +613,29 @@ export default function Home() {
       <div className="relative z-10">
 
         {/* ══ HERO ══ */}
-        <section id="home" className="max-w-7xl mx-auto px-4 md:px-6 pt-16 pb-20 grid lg:grid-cols-2 gap-16 items-center">
+        <section id="home" className="max-w-7xl mx-auto px-4 md:px-6 pt-8 md:pt-16 pb-12 md:pb-20 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
-          <div className="anim-fade-up">
-            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full glass border border-cyan-500/20 text-xs font-bold text-cyan-400 mb-8">
-              <LiveDot /> Stage 1 Presale — ${PRESALE_STAGE1_PRICE} / AIDAG
+          <div className="anim-fade-up min-w-0">
+            <div className="inline-flex items-center gap-2.5 px-3 sm:px-4 py-2 rounded-full glass border border-cyan-500/20 text-[11px] sm:text-xs font-bold text-cyan-400 mb-6 sm:mb-8 max-w-full">
+              <LiveDot /> <span className="truncate">Stage 1 Presale — ${PRESALE_STAGE1_PRICE} / AIDAG</span>
             </div>
 
-            <h1 className="text-4xl md:text-5xl xl:text-6xl font-black tracking-tight leading-[1.05] mb-5">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-black tracking-tight leading-[1.08] mb-4 sm:mb-5 break-words">
               <span className="text-white">{t.hero_title.split('\n')[0]}</span>
             </h1>
-            <div className="text-2xl md:text-3xl font-black text-shimmer mb-3">{t.hero_subtitle}</div>
+            <div className="text-xl sm:text-2xl md:text-3xl font-black text-shimmer mb-3">{t.hero_subtitle}</div>
 
-            <p className="text-gray-400 text-base md:text-lg leading-relaxed mb-8 max-w-xl">
+            <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed mb-7 sm:mb-8 max-w-xl">
               {t.hero_desc}
             </p>
 
             {/* Contract address */}
-            <div className="glass rounded-xl border border-white/[0.07] px-4 py-3 mb-8 flex items-center gap-3">
-              <span className="text-xs text-gray-500 flex-shrink-0 font-medium">Contract:</span>
+            <div className="glass rounded-xl border border-white/[0.07] px-3 sm:px-4 py-3 mb-7 sm:mb-8 flex items-center gap-2 sm:gap-3 min-w-0">
+              <span className="text-[11px] sm:text-xs text-gray-500 flex-shrink-0 font-medium">Contract:</span>
               <a href={BSCSCAN_TOKEN_URL} target="_blank" rel="noopener noreferrer"
-                className="font-mono text-xs text-cyan-400 hover:text-cyan-300 truncate transition-colors">
-                {TOKEN_CONTRACT}
+                className="font-mono text-[11px] sm:text-xs text-cyan-400 hover:text-cyan-300 truncate transition-colors min-w-0 flex-1">
+                <span className="hidden sm:inline">{TOKEN_CONTRACT}</span>
+                <span className="sm:hidden">{TOKEN_CONTRACT.slice(0, 8)}…{TOKEN_CONTRACT.slice(-6)}</span>
               </a>
               <CopyBtn text={TOKEN_CONTRACT} />
               <a href={BSCSCAN_TOKEN_URL} target="_blank" rel="noopener noreferrer"
@@ -646,48 +647,54 @@ export default function Home() {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-10">
-              <Link href="/presale" className="btn btn-primary px-8 py-4 rounded-2xl text-base font-black text-white">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 mb-9 sm:mb-10">
+              <Link href="/presale" className="btn btn-primary px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-black text-white justify-center">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 {t.hero_buy}
               </Link>
-              <WalletButton className="px-8 py-4 rounded-2xl text-base" />
-              <Link href="/lsc" className="btn btn-gold px-8 py-4 rounded-2xl text-base font-bold">
+              <WalletButton className="px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base justify-center" />
+              <Link href="/lsc" className="btn btn-gold px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-bold justify-center">
                 ⬡ {t.hero_lsc}
               </Link>
             </div>
 
             {/* Key metrics */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
               {[
-                { label: 'Max Supply', val: '21,000,000', unit: 'AIDAG · Fixed', c: 'text-cyan-400' },
-                { label: 'Stage 1 Price', val: `$${PRESALE_STAGE1_PRICE}`, unit: `→ $${LISTING_PRICE} listing`, c: 'text-purple-400' },
-                { label: 'Network', val: 'BSC', unit: 'BEP-20 · Chain 56', c: 'text-yellow-400' },
+                { label: 'Max Supply', val: '21M', valFull: '21,000,000', unit: 'AIDAG · Fixed', c: 'text-cyan-400' },
+                { label: 'Stage 1', val: `$${PRESALE_STAGE1_PRICE}`, valFull: `$${PRESALE_STAGE1_PRICE}`, unit: `→ $${LISTING_PRICE} listing`, c: 'text-purple-400' },
+                { label: 'Network', val: 'BSC', valFull: 'BSC', unit: 'BEP-20 · Chain 56', c: 'text-yellow-400' },
               ].map((s, i) => (
-                <div key={i} className="glass rounded-xl border border-white/[0.06] p-3 text-center">
-                  <div className={`text-xl font-black font-mono ${s.c} leading-none mb-1`}>{s.val}</div>
-                  <div className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">{s.label}</div>
-                  <div className="text-[9px] text-gray-700 mt-0.5">{s.unit}</div>
+                <div key={i} className="glass rounded-xl border border-white/[0.06] p-2.5 sm:p-3 text-center min-w-0">
+                  <div className={`text-base sm:text-xl font-black font-mono ${s.c} leading-none mb-1`}>
+                    <span className="sm:hidden">{s.val}</span>
+                    <span className="hidden sm:inline">{s.valFull}</span>
+                  </div>
+                  <div className="text-[9px] sm:text-[10px] text-gray-500 font-medium uppercase tracking-wider truncate">{s.label}</div>
+                  <div className="text-[8px] sm:text-[9px] text-gray-700 mt-0.5 truncate">{s.unit}</div>
                 </div>
               ))}
             </div>
           </div>
 
           {/* SoulwareAI Brain */}
-          <div className="relative h-[460px] lg:h-[540px] anim-fade-up delay-3">
+          <div className="relative h-[320px] sm:h-[400px] lg:h-[540px] anim-fade-up delay-3">
             <div className="absolute inset-0 rounded-3xl glass border border-cyan-500/15 overflow-hidden">
               <NeuralBrain />
             </div>
-            <div className="absolute top-4 left-4 glass-cyan rounded-xl px-3 py-2 text-xs font-bold text-cyan-400 flex items-center gap-2">
-              <LiveDot color="cyan" /> SoulwareAI — AIDAG Chain Brain
+            <div className="absolute top-3 left-3 sm:top-4 sm:left-4 glass-cyan rounded-lg sm:rounded-xl px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs font-bold text-cyan-400 flex items-center gap-1.5 sm:gap-2 max-w-[60%]">
+              <LiveDot color="cyan" /> <span className="truncate"><span className="hidden sm:inline">SoulwareAI — </span>AIDAG Brain</span>
             </div>
-            <div className="absolute bottom-4 right-4 glass rounded-xl px-3 py-2 text-xs font-mono text-emerald-400 border border-emerald-500/20">
+            <div className="hidden sm:flex absolute bottom-4 right-4 glass rounded-xl px-3 py-2 text-xs font-mono text-emerald-400 border border-emerald-500/20">
               {chain.loading ? 'Connecting BSC RPC...' : `Block #${chain.blockNumber.toLocaleString()} · ${chain.gasPrice}`}
             </div>
-            <div className="absolute top-4 right-4 glass rounded-xl px-3 py-2 text-xs font-bold text-amber-400 border border-amber-500/20 flex items-center gap-1.5">
-              <LiveDot color="amber" /> LSC Builder Active
+            <div className="absolute bottom-3 left-3 sm:hidden glass rounded-lg px-2 py-1 text-[10px] font-mono text-emerald-400 border border-emerald-500/20">
+              {chain.loading ? '···' : `#${chain.blockNumber.toLocaleString()}`}
+            </div>
+            <div className="absolute top-3 right-3 sm:top-4 sm:right-4 glass rounded-lg sm:rounded-xl px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs font-bold text-amber-400 border border-amber-500/20 flex items-center gap-1.5">
+              <LiveDot color="amber" /> <span className="hidden sm:inline">LSC Builder Active</span><span className="sm:hidden">LSC</span>
             </div>
           </div>
         </section>

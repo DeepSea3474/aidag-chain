@@ -237,7 +237,7 @@ export default function PresalePage() {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-cyan-500/20 text-xs font-bold text-cyan-400 mb-6">
             <LiveDot /> Stage 1 Presale — LIVE NOW
           </div>
-          <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-4">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight mb-4">
             Buy <span className="text-gradient">AIDAG</span> Token
           </h1>
           <p className="text-gray-400 text-lg mb-3">

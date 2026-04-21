@@ -94,27 +94,27 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
       </div>
 
       {/* Main nav */}
-      <div className="px-4 md:px-6 py-3 flex items-center justify-between gap-4">
+      <div className="px-3 sm:px-4 md:px-6 py-3 flex items-center justify-between gap-2 sm:gap-4">
         {/* ═══ Logo: AIDAG (navy gradient) CHAIN (white) with quantum glow ═══ */}
-        <Link href="/" className="flex items-center gap-3 shrink-0 group">
-          <div className="relative">
+        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group min-w-0">
+          <div className="relative shrink-0">
             {/* Triple-layer pulsing glow */}
             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-600 via-indigo-700 to-cyan-500 blur-lg opacity-60 group-hover:opacity-100 transition-all duration-500 animate-pulse" />
             <div className="absolute -inset-1 rounded-full bg-cyan-400/20 blur-md group-hover:bg-cyan-400/40 transition-all" />
             {/* Logo image */}
-            <div className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-cyan-400/40 group-hover:border-cyan-300/70 transition-all shadow-lg shadow-cyan-500/30">
+            <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-full overflow-hidden border-2 border-cyan-400/40 group-hover:border-cyan-300/70 transition-all shadow-lg shadow-cyan-500/30">
               <Image src="/aidag-logo.jpg" alt="AIDAG" width={44} height={44} className="rounded-full" />
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-transparent via-cyan-400/10 to-blue-600/20 mix-blend-overlay" />
             </div>
           </div>
-          <div className="leading-tight">
-            <div className="font-black text-xl tracking-tight flex items-baseline gap-1.5 select-none">
+          <div className="leading-tight min-w-0">
+            <div className="font-black text-lg sm:text-xl tracking-tight flex items-baseline gap-1.5 select-none">
               {/* AIDAG — navy/blue gradient with shimmer */}
               <span className="aidag-brand">AIDAG</span>
               {/* CHAIN — pure white with subtle glow */}
               <span className="chain-brand">CHAIN</span>
             </div>
-            <div className="text-[9px] text-cyan-400/70 font-bold tracking-[0.25em] uppercase flex items-center gap-1">
+            <div className="hidden sm:flex text-[9px] text-cyan-400/70 font-bold tracking-[0.25em] uppercase items-center gap-1">
               <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
               SoulwareAI · Autonomous
             </div>
@@ -212,7 +212,7 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
           {/* Buy AIDAG — prominent CTA, always visible */}
           <Link
             href="/presale"
-            className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:from-emerald-400 hover:to-green-500 transition-all shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:-translate-y-0.5"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-black bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:from-emerald-400 hover:to-green-500 transition-all shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:-translate-y-0.5"
           >
             <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

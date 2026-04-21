@@ -193,10 +193,10 @@ export default function SoulwarePage() {
                 SoulwareAI — AUTONOMOUS · LIVE
               </div>
 
-              <h1 className="text-4xl md:text-5xl xl:text-6xl font-black tracking-tight leading-[1.05] mb-5">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-black tracking-tight leading-[1.05] mb-5">
                 <span className="text-shimmer">SoulwareAI</span>
                 <br />
-                <span className="text-white text-3xl md:text-4xl font-black">The Brain of AIDAG Chain</span>
+                <span className="text-white text-2xl sm:text-3xl md:text-4xl font-black">The Brain of AIDAG Chain</span>
               </h1>
 
               <p className="text-gray-400 text-base leading-relaxed mb-6 max-w-lg">
