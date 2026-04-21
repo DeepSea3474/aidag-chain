@@ -43,13 +43,18 @@ export default function GenesisHeartbeat() {
     let beatPhase = -1; // -1 = idle, 0..1 = drawing waveform
 
     const drawGrid = () => {
-      ctx.fillStyle = '#020617';
+      // deep green-black background (classic cardiograph CRT)
+      const bgGrad = ctx.createRadialGradient(W() / 2, H() / 2, 0, W() / 2, H() / 2, Math.max(W(), H()) * 0.7);
+      bgGrad.addColorStop(0, '#021a10');
+      bgGrad.addColorStop(0.6, '#010a07');
+      bgGrad.addColorStop(1, '#000503');
+      ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, W(), H());
 
-      // subtle grid lines
-      ctx.strokeStyle = 'rgba(34,197,94,0.06)';
+      // fine grid (1mm)
+      ctx.strokeStyle = 'rgba(74,222,128,0.08)';
       ctx.lineWidth = 1;
-      const step = 20;
+      const step = 12;
       ctx.beginPath();
       for (let x = 0; x < W(); x += step) {
         ctx.moveTo(x, 0); ctx.lineTo(x, H());
@@ -59,8 +64,9 @@ export default function GenesisHeartbeat() {
       }
       ctx.stroke();
 
-      // major grid every 5 cells
-      ctx.strokeStyle = 'rgba(34,197,94,0.12)';
+      // major grid (5mm) — brighter green
+      ctx.strokeStyle = 'rgba(74,222,128,0.22)';
+      ctx.lineWidth = 1;
       ctx.beginPath();
       for (let x = 0; x < W(); x += step * 5) {
         ctx.moveTo(x, 0); ctx.lineTo(x, H());
@@ -70,13 +76,22 @@ export default function GenesisHeartbeat() {
       }
       ctx.stroke();
 
-      // baseline
+      // baseline glow
       const mid = H() / 2;
-      ctx.strokeStyle = 'rgba(16,185,129,0.18)';
+      ctx.strokeStyle = 'rgba(34,197,94,0.28)';
       ctx.lineWidth = 1;
+      ctx.shadowColor = 'rgba(34,197,94,0.5)';
+      ctx.shadowBlur = 4;
       ctx.beginPath();
       ctx.moveTo(0, mid); ctx.lineTo(W(), mid);
       ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // subtle scanline overlay (CRT feel)
+      ctx.fillStyle = 'rgba(0,0,0,0.18)';
+      for (let y = 0; y < H(); y += 3) {
+        ctx.fillRect(0, y, W(), 1);
+      }
     };
 
     /**
@@ -136,14 +151,42 @@ export default function GenesisHeartbeat() {
       // Draw
       drawGrid();
       const mid = H() / 2;
-
-      // Glow trace
-      ctx.lineWidth = 2;
-      ctx.shadowColor = 'rgba(16,185,129,0.7)';
-      ctx.shadowBlur = 10;
-      ctx.strokeStyle = '#10b981';
-      ctx.beginPath();
       const xOffset = W() - samples.length;
+
+      // Outer halo (deep dark green glow)
+      ctx.lineWidth = 6;
+      ctx.shadowColor = 'rgba(16,185,129,0.55)';
+      ctx.shadowBlur = 22;
+      ctx.strokeStyle = 'rgba(34,197,94,0.18)';
+      ctx.beginPath();
+      for (let i = 0; i < samples.length; i++) {
+        const x = xOffset + i;
+        const y = mid - samples[i];
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Mid stroke (medium green)
+      ctx.lineWidth = 3;
+      ctx.shadowColor = 'rgba(74,222,128,0.85)';
+      ctx.shadowBlur = 14;
+      ctx.strokeStyle = 'rgba(74,222,128,0.75)';
+      ctx.beginPath();
+      for (let i = 0; i < samples.length; i++) {
+        const x = xOffset + i;
+        const y = mid - samples[i];
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Bright neon core (light phosphor green)
+      ctx.lineWidth = 1.4;
+      ctx.shadowColor = '#86efac';
+      ctx.shadowBlur = 8;
+      ctx.strokeStyle = '#bbf7d0';
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
       for (let i = 0; i < samples.length; i++) {
         const x = xOffset + i;
         const y = mid - samples[i];
@@ -152,15 +195,34 @@ export default function GenesisHeartbeat() {
       ctx.stroke();
       ctx.shadowBlur = 0;
 
-      // Sweep cursor (head dot)
+      // Trail fade on the right edge (CRT phosphor decay illusion)
+      const fadeGrad = ctx.createLinearGradient(W() - 60, 0, W(), 0);
+      fadeGrad.addColorStop(0, 'rgba(2,26,16,0)');
+      fadeGrad.addColorStop(1, 'rgba(2,26,16,0.45)');
+      ctx.fillStyle = fadeGrad;
+      ctx.fillRect(W() - 60, 0, 60, H());
+
+      // Sweep cursor (head dot — bright phosphor flare)
       if (samples.length > 0) {
         const lastY = mid - samples[samples.length - 1];
-        const lastX = W() - 1;
-        ctx.fillStyle = '#34d399';
-        ctx.shadowColor = '#34d399';
-        ctx.shadowBlur = 14;
+        const lastX = W() - 2;
+
+        // outer flare halo
+        const flare = ctx.createRadialGradient(lastX, lastY, 0, lastX, lastY, 22);
+        flare.addColorStop(0, 'rgba(187,247,208,0.9)');
+        flare.addColorStop(0.4, 'rgba(74,222,128,0.5)');
+        flare.addColorStop(1, 'rgba(34,197,94,0)');
+        ctx.fillStyle = flare;
         ctx.beginPath();
-        ctx.arc(lastX, lastY, 3.2, 0, Math.PI * 2);
+        ctx.arc(lastX, lastY, 22, 0, Math.PI * 2);
+        ctx.fill();
+
+        // bright core dot
+        ctx.fillStyle = '#ecfccb';
+        ctx.shadowColor = '#bbf7d0';
+        ctx.shadowBlur = 18;
+        ctx.beginPath();
+        ctx.arc(lastX, lastY, 3.4, 0, Math.PI * 2);
         ctx.fill();
         ctx.shadowBlur = 0;
       }
@@ -216,12 +278,14 @@ export default function GenesisHeartbeat() {
         </div>
       </div>
 
-      <div className="relative w-full h-28 sm:h-36 rounded-xl overflow-hidden border border-emerald-500/15 bg-[#020617]">
+      <div className="relative w-full h-32 sm:h-40 rounded-xl overflow-hidden border border-emerald-500/30 shadow-[inset_0_0_40px_rgba(16,185,129,0.25),0_0_30px_rgba(16,185,129,0.18)] bg-[#010a07]">
         <canvas ref={canvasRef} className="w-full h-full block" />
-        <div className="absolute top-1.5 left-2 text-[9px] font-mono text-emerald-400/60 tracking-wider">
+        {/* Vignette */}
+        <div className="pointer-events-none absolute inset-0 rounded-xl" style={{ boxShadow: 'inset 0 0 60px rgba(0,0,0,0.7)' }} />
+        <div className="absolute top-1.5 left-2 text-[9px] font-mono text-emerald-300/80 tracking-wider drop-shadow-[0_0_4px_rgba(74,222,128,0.6)]">
           AIDAG-LSC · LEAD II · 25mm/s · 10mm/mV
         </div>
-        <div className="absolute bottom-1.5 right-2 text-[9px] font-mono text-emerald-400/60 tracking-wider">
+        <div className={`absolute bottom-1.5 right-2 text-[9px] font-mono tracking-wider ${pulse ? 'text-emerald-200 drop-shadow-[0_0_6px_rgba(187,247,208,0.9)]' : 'text-emerald-500/50'}`}>
           {pulse ? '◉ BEAT' : '○ idle'}
         </div>
       </div>
