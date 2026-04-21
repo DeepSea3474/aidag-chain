@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import WalletButton from '../../components/WalletButton';
+import Navbar from '../../components/Navbar';
 import { useChainData } from '../../lib/useChainData';
 import {
   SOULWARE_IDENTITY, BRAIN_CELLS, getInitialEvents, generateEvent, getLSCMetrics,
@@ -174,23 +175,9 @@ export default function SoulwarePage() {
         <div className="absolute bottom-0 left-1/3 w-[600px] h-[600px] rounded-full bg-blue-500/[0.03] blur-[120px]" />
       </div>
 
-      {/* ── Nav ── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#020617]/92 backdrop-blur-2xl border-b border-white/[0.05]">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2.5">
-            <Image src="/aidag-logo.jpg" alt="AIDAG" width={32} height={32} className="rounded-full border border-cyan-500/20" />
-            <span className="font-black text-sm text-gradient">AIDAG DAO</span>
-          </Link>
-          <div className="hidden md:flex items-center gap-1">
-            {[['/', 'Home'], ['/presale', 'Presale'], ['/dao', 'DAO'], ['/lsc', 'LSC Chain'], ['/soulware', 'SoulwareAI']].map(([h, l]) => (
-              <Link key={h} href={h} className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-all ${h === '/soulware' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'text-gray-400 hover:text-white hover:bg-white/[0.05]'}`}>{l}</Link>
-            ))}
-          </div>
-          <WalletButton />
-        </div>
-      </nav>
+      <Navbar activePage="soulware" />
 
-      <div className="relative z-10 pt-[90px] max-w-7xl mx-auto px-4 md:px-6 py-10">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-10">
 
         {/* ── HERO ── */}
         <div className="relative rounded-3xl overflow-hidden glass border border-cyan-500/15 mb-10">

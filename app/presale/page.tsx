@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useCallback } from 'react';
 import WalletButton from '../../components/WalletButton';
+import Navbar from '../../components/Navbar';
 import { useWallet } from '../../lib/useWallet';
 import { useChainData } from '../../lib/useChainData';
 import {
@@ -207,23 +208,9 @@ export default function PresalePage() {
         <div className="absolute bottom-0 right-0 w-[600px] h-[600px] rounded-full bg-purple-500/[0.04] blur-[120px]" />
       </div>
 
-      {/* ── Nav ── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#020617]/90 backdrop-blur-2xl border-b border-white/[0.05]">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2.5">
-            <Image src="/aidag-logo.jpg" alt="AIDAG" width={32} height={32} className="rounded-full border border-cyan-500/20" />
-            <span className="font-black text-sm text-gradient">AIDAG DAO</span>
-          </Link>
-          <div className="hidden md:flex items-center gap-1">
-            {[['/', 'Home'], ['/presale', 'Presale'], ['/dao', 'DAO'], ['/lsc', 'LSC Chain']].map(([h, l]) => (
-              <Link key={h} href={h} className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-all ${h === '/presale' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'text-gray-400 hover:text-white hover:bg-white/[0.05]'}`}>{l}</Link>
-            ))}
-          </div>
-          <WalletButton />
-        </div>
-      </nav>
+      <Navbar activePage="presale" />
 
-      <div className="relative z-10 pt-[100px] max-w-7xl mx-auto px-4 md:px-6 py-12">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-12">
         {/* Header */}
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-cyan-500/20 text-xs font-bold text-cyan-400 mb-6">

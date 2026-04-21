@@ -4,6 +4,7 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useState, useEffect, useCallback } from 'react';
 import WalletButton from '../components/WalletButton';
+import Navbar from '../components/Navbar';
 import { useChainData } from '../lib/useChainData';
 import {
   TOKEN_CONTRACT, BSCSCAN_TOKEN_URL, GITHUB_URL, TELEGRAM_URL, TWITTER_URL,
@@ -391,6 +392,20 @@ export default function Home() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Sync with global Navbar language switcher (aidag-lang-change event + localStorage)
+  useEffect(() => {
+    try {
+      const stored = (typeof window !== 'undefined' && localStorage.getItem('aidag_lang')) as LangCode | null;
+      if (stored && T[stored]) setLang(stored);
+    } catch {}
+    const onLang = (e: Event) => {
+      const code = (e as CustomEvent).detail?.lang as LangCode | undefined;
+      if (code && T[code]) setLang(code);
+    };
+    window.addEventListener('aidag-lang-change', onLang as EventListener);
+    return () => window.removeEventListener('aidag-lang-change', onLang as EventListener);
+  }, []);
+
   const navLinks = [
     { label: 'Home', href: '/' },
     { label: 'Presale', href: '/presale' },
@@ -414,10 +429,10 @@ export default function Home() {
         <div className="absolute bottom-0 left-1/3 w-[600px] h-[600px] rounded-full bg-blue-500/[0.04] blur-[120px]" />
       </div>
 
-      {/* ════════════════════════════════════════════════
-          NAV
-      ════════════════════════════════════════════════ */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-[#020617]/96 backdrop-blur-2xl border-b border-white/[0.06] shadow-2xl shadow-black/50' : 'bg-transparent border-b border-transparent'}`}>
+      <Navbar activePage="home" />
+
+      {/* ─── Legacy header (hidden — replaced by global Navbar) ─── */}
+      <nav className="hidden">
 
         {/* Status bar */}
         <div className="hidden lg:flex items-center justify-between px-6 py-1 border-b border-white/[0.04] text-[11px] font-medium">
@@ -568,7 +583,7 @@ export default function Home() {
       </nav>
 
       {/* ─── Live ticker ─── */}
-      <div className="fixed top-[73px] lg:top-[93px] left-0 right-0 z-40 border-b border-white/[0.04] bg-[#020617]/80 backdrop-blur-md py-1.5 ticker-wrap overflow-hidden">
+      <div className="relative z-10 border-b border-white/[0.04] bg-[#020617]/80 backdrop-blur-md py-1.5 ticker-wrap overflow-hidden">
         <div className="anim-ticker inline-flex gap-12 text-[11px] font-medium text-gray-500 px-6">
           {[...Array(3)].flatMap(() => [
             { label: 'AIDAG', val: `$${PRESALE_STAGE1_PRICE}`, extra: '▲ Stage 1', c: 'text-cyan-400' },
@@ -592,7 +607,7 @@ export default function Home() {
       {/* ════════════════════════════════════════════
           CONTENT
       ════════════════════════════════════════════ */}
-      <div className="relative z-10 pt-[120px] lg:pt-[140px]">
+      <div className="relative z-10">
 
         {/* ══ HERO ══ */}
         <section id="home" className="max-w-7xl mx-auto px-4 md:px-6 pt-16 pb-20 grid lg:grid-cols-2 gap-16 items-center">

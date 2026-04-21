@@ -1,7 +1,9 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { openWeb3Modal } from '../lib/web3modal';
+import Link from 'next/link';
+import WalletButton from './WalletButton';
+import { useWalletContext } from '../lib/WalletContext';
 
 const LANGUAGES = [
   { code: 'en', flag: '🇬🇧', name: 'English' },
@@ -16,22 +18,16 @@ const LANGUAGES = [
   { code: 'ja', flag: '🇯🇵', name: '日本語' },
 ];
 
-const CHAINS = [
-  { name: 'BSC', color: '#f0b90b', icon: '⬡' },
-  { name: 'ETH', color: '#627eea', icon: '◈' },
-  { name: 'Polygon', color: '#8247e5', icon: '⬟' },
-];
-
 interface NavbarProps {
-  activePage?: 'home' | 'lsc' | 'dao' | 'presale' | 'docs';
+  activePage?: 'home' | 'lsc' | 'dao' | 'presale' | 'soulware' | 'docs';
 }
 
 export default function Navbar({ activePage = 'home' }: NavbarProps) {
+  const { openModal, isConnected } = useWalletContext();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [lang, setLang] = useState('en');
   const [scrolled, setScrolled] = useState(false);
-  const [walletAddr, setWalletAddr] = useState('');
   const [lscOpen, setLscOpen] = useState(false);
   const langRef = useRef<HTMLDivElement>(null);
   const lscRef = useRef<HTMLDivElement>(null);
@@ -43,6 +39,13 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
   }, []);
 
   useEffect(() => {
+    try {
+      const saved = localStorage.getItem('aidag_lang');
+      if (saved) setLang(saved);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
     const close = (e: MouseEvent) => {
       if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false);
       if (lscRef.current && !lscRef.current.contains(e.target as Node)) setLscOpen(false);
@@ -51,11 +54,21 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
     return () => document.removeEventListener('mousedown', close);
   }, []);
 
-  const connectWallet = async () => {
-    await openWeb3Modal();
+  const changeLang = (code: string) => {
+    setLang(code);
+    setLangOpen(false);
+    try { localStorage.setItem('aidag_lang', code); } catch {}
+    window.dispatchEvent(new CustomEvent('aidag-lang-change', { detail: code }));
   };
 
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
+
+  const navItems = [
+    { label: 'Home',     href: '/',         key: 'home',     icon: '◇' },
+    { label: 'Presale',  href: '/presale',  key: 'presale',  icon: '◈', accent: 'green' },
+    { label: 'DAO',      href: '/dao',      key: 'dao',      icon: '⬢', accent: 'purple' },
+    { label: 'SoulwareAI', href: '/soulware', key: 'soulware', icon: '◉', accent: 'cyan' },
+  ];
 
   return (
     <nav className={`navbar transition-all duration-300 ${scrolled ? 'shadow-2xl shadow-black/50' : ''}`}>
@@ -70,61 +83,82 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
           <span>BSC Block: <span className="text-cyan-400 font-mono">#{(47823941 + Math.floor(Date.now() / 3000)).toLocaleString()}</span></span>
           <span className="text-gray-700">|</span>
           <span>AIDAG: <span className="text-green-400 font-semibold">$0.078</span></span>
+          <span className="text-gray-700">|</span>
+          <span className="text-amber-400/80">Stage 1 Live · Listing $0.12</span>
         </div>
         <div className="flex items-center gap-3 text-gray-600">
-          {CHAINS.map(c => (
-            <span key={c.name} className="flex items-center gap-1">
-              <span style={{ color: c.color }}>{c.icon}</span> {c.name}
-            </span>
-          ))}
+          <span className="flex items-center gap-1"><span style={{ color: '#f0b90b' }}>⬡</span> BSC</span>
+          <span className="flex items-center gap-1"><span style={{ color: '#627eea' }}>◈</span> ETH</span>
+          <span className="flex items-center gap-1"><span style={{ color: '#8247e5' }}>⬟</span> Polygon</span>
         </div>
       </div>
 
       {/* Main nav */}
-      <div className="px-4 md:px-6 py-3.5 flex items-center justify-between gap-4">
-        {/* Logo */}
-        <a href="/" className="flex items-center gap-3 shrink-0 group">
+      <div className="px-4 md:px-6 py-3 flex items-center justify-between gap-4">
+        {/* ═══ Logo: AIDAG (navy gradient) CHAIN (white) with quantum glow ═══ */}
+        <Link href="/" className="flex items-center gap-3 shrink-0 group">
           <div className="relative">
-            <div className="absolute inset-0 rounded-full bg-cyan-500/40 blur-md group-hover:bg-cyan-500/60 transition-all" />
-            <div className="relative w-9 h-9 rounded-full overflow-hidden border border-cyan-500/30 group-hover:border-cyan-400/60 transition-all">
-              <Image src="/aidag-logo.jpg" alt="AIDAG" width={36} height={36} className="rounded-full" />
+            {/* Triple-layer pulsing glow */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-600 via-indigo-700 to-cyan-500 blur-lg opacity-60 group-hover:opacity-100 transition-all duration-500 animate-pulse" />
+            <div className="absolute -inset-1 rounded-full bg-cyan-400/20 blur-md group-hover:bg-cyan-400/40 transition-all" />
+            {/* Logo image */}
+            <div className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-cyan-400/40 group-hover:border-cyan-300/70 transition-all shadow-lg shadow-cyan-500/30">
+              <Image src="/aidag-logo.jpg" alt="AIDAG" width={44} height={44} className="rounded-full" />
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-transparent via-cyan-400/10 to-blue-600/20 mix-blend-overlay" />
             </div>
           </div>
           <div className="leading-tight">
-            <div className="font-black text-base text-gradient tracking-tight">AIDAG DAO</div>
-            <div className="text-[10px] text-gray-500 font-medium tracking-widest uppercase">Chain</div>
+            <div className="font-black text-xl tracking-tight flex items-baseline gap-1.5 select-none">
+              {/* AIDAG — navy/blue gradient with shimmer */}
+              <span className="aidag-brand">AIDAG</span>
+              {/* CHAIN — pure white with subtle glow */}
+              <span className="chain-brand">CHAIN</span>
+            </div>
+            <div className="text-[9px] text-cyan-400/70 font-bold tracking-[0.25em] uppercase flex items-center gap-1">
+              <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+              SoulwareAI · Autonomous
+            </div>
           </div>
-        </a>
+        </Link>
 
         {/* Desktop nav links */}
         <div className="hidden lg:flex items-center gap-1">
-          {[
-            { label: 'Home', href: '/', key: 'home' },
-            { label: 'Presale', href: '/#presale', key: 'presale' },
-            { label: 'DAO', href: '/#dao', key: 'dao' },
-            { label: 'Docs', href: '/#docs', key: 'docs' },
-          ].map(item => (
-            <a
-              key={item.key}
-              href={item.href}
-              className={`relative px-3.5 py-2 rounded-lg text-sm font-medium transition-all group ${
-                activePage === item.key
-                  ? 'text-white bg-white/[0.06]'
-                  : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
-              }`}
-            >
-              {item.label}
-              {activePage === item.key && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-cyan-400 rounded-full" />
-              )}
-            </a>
-          ))}
+          {navItems.map(item => {
+            const active = activePage === item.key;
+            const accentColor =
+              item.accent === 'green' ? 'text-emerald-400' :
+              item.accent === 'purple' ? 'text-purple-400' :
+              item.accent === 'cyan' ? 'text-cyan-400' :
+              'text-gray-300';
+            return (
+              <Link
+                key={item.key}
+                href={item.href}
+                className={`relative px-3.5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-1.5 ${
+                  active
+                    ? `${accentColor} bg-white/[0.06]`
+                    : `text-gray-400 hover:text-white hover:bg-white/[0.04]`
+                }`}
+              >
+                <span className={`text-[10px] ${active ? accentColor : 'opacity-50'}`}>{item.icon}</span>
+                {item.label}
+                {active && (
+                  <span className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full ${
+                    item.accent === 'green' ? 'bg-emerald-400' :
+                    item.accent === 'purple' ? 'bg-purple-400' :
+                    item.accent === 'cyan' ? 'bg-cyan-400' :
+                    'bg-cyan-400'
+                  }`} />
+                )}
+              </Link>
+            );
+          })}
 
           {/* LSC Chain dropdown */}
           <div className="relative" ref={lscRef}>
             <button
               onClick={() => setLscOpen(!lscOpen)}
-              className={`relative px-3.5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 group ${
+              className={`relative px-3.5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-1.5 ${
                 activePage === 'lsc'
                   ? 'text-amber-400 bg-amber-500/10'
                   : 'text-amber-400/70 hover:text-amber-400 hover:bg-amber-500/[0.06]'
@@ -132,10 +166,10 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
             >
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
               LSC Chain
-              <svg className={`w-3.5 h-3.5 transition-transform ${lscOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className={`w-3 h-3 transition-transform ${lscOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
-              <span className="absolute -top-1 -right-1 text-[9px] font-bold bg-amber-500 text-black px-1.5 py-0.5 rounded-full">2027</span>
+              <span className="absolute -top-1 -right-1 text-[8px] font-black bg-gradient-to-r from-amber-500 to-orange-500 text-black px-1.5 py-0.5 rounded-full shadow-lg shadow-amber-500/50">2027</span>
             </button>
 
             {lscOpen && (
@@ -144,36 +178,29 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
                   <div className="text-[10px] font-bold uppercase tracking-widest text-amber-400/60 mb-1">2027 Roadmap</div>
                   <div className="text-xs text-gray-400">LSC Chain — 100,000+ TPS DAG Blockchain</div>
                 </div>
-                <a href="/lsc" className="flex items-start gap-3 px-3 py-2.5 rounded-xl hover:bg-amber-500/10 transition-all group">
+                <Link href="/lsc" onClick={() => setLscOpen(false)} className="flex items-start gap-3 px-3 py-2.5 rounded-xl hover:bg-amber-500/10 transition-all group">
                   <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400 text-base mt-0.5 shrink-0">⬡</div>
                   <div>
                     <div className="text-sm font-semibold text-white group-hover:text-amber-400 transition-colors">LSC Dashboard</div>
-                    <div className="text-xs text-gray-500">Live DAG network, TPS, chain metrics</div>
+                    <div className="text-xs text-gray-500">Live DAG · TPS · cell network</div>
                   </div>
-                </a>
-                <a href="/lsc#devlog" className="flex items-start gap-3 px-3 py-2.5 rounded-xl hover:bg-amber-500/10 transition-all group">
-                  <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400 text-base mt-0.5 shrink-0">📡</div>
-                  <div>
-                    <div className="text-sm font-semibold text-white group-hover:text-amber-400 transition-colors">Dev Log</div>
-                    <div className="text-xs text-gray-500">SoulwareAI autonomous development updates</div>
-                  </div>
-                </a>
-                <a href="/lsc#roadmap" className="flex items-start gap-3 px-3 py-2.5 rounded-xl hover:bg-amber-500/10 transition-all group">
+                </Link>
+                <Link href="/lsc#roadmap" onClick={() => setLscOpen(false)} className="flex items-start gap-3 px-3 py-2.5 rounded-xl hover:bg-amber-500/10 transition-all group">
                   <div className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-base mt-0.5 shrink-0">🗺</div>
                   <div>
                     <div className="text-sm font-semibold text-white group-hover:text-amber-400 transition-colors">Roadmap 2025–2027</div>
-                    <div className="text-xs text-gray-500">Full autonomy milestones & progress</div>
+                    <div className="text-xs text-gray-500">Autonomy milestones</div>
                   </div>
-                </a>
-                <a href="/lsc#whitepaper" className="flex items-start gap-3 px-3 py-2.5 rounded-xl hover:bg-amber-500/10 transition-all group">
+                </Link>
+                <Link href="/lsc#whitepaper" onClick={() => setLscOpen(false)} className="flex items-start gap-3 px-3 py-2.5 rounded-xl hover:bg-amber-500/10 transition-all group">
                   <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400 text-base mt-0.5 shrink-0">📄</div>
                   <div>
                     <div className="text-sm font-semibold text-white group-hover:text-amber-400 transition-colors">Whitepaper</div>
-                    <div className="text-xs text-gray-500">DAG architecture & consensus model</div>
+                    <div className="text-xs text-gray-500">DAG architecture · consensus</div>
                   </div>
-                </a>
-                <div className="mt-2 mx-3 mb-1 p-2 rounded-xl bg-amber-500/5 border border-amber-500/15">
-                  <div className="text-[10px] text-amber-400/70 font-medium">⚡ AIDAG holders get early LSC access</div>
+                </Link>
+                <div className="mt-2 mx-3 mb-1 p-2 rounded-xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20">
+                  <div className="text-[10px] text-amber-400 font-bold">⚡ AIDAG holders → priority LSC allocation @ 1:100</div>
                 </div>
               </div>
             )}
@@ -182,14 +209,28 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
+          {/* Buy AIDAG — prominent CTA, always visible */}
+          <Link
+            href="/presale"
+            className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:from-emerald-400 hover:to-green-500 transition-all shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:-translate-y-0.5"
+          >
+            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="hidden md:inline">Buy AIDAG</span>
+            <span className="md:hidden">Buy</span>
+            <span className="hidden lg:inline text-[9px] bg-white/20 px-1 py-0.5 rounded ml-0.5">$0.078</span>
+          </Link>
+
           {/* Language */}
           <div className="relative" ref={langRef}>
             <button
               onClick={() => setLangOpen(!langOpen)}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/[0.05] transition-all border border-white/[0.06] hover:border-white/[0.12]"
+              className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/[0.05] transition-all border border-white/[0.06] hover:border-white/[0.12]"
+              title="Change language"
             >
               <span className="text-base leading-none">{currentLang.flag}</span>
-              <span className="hidden sm:block text-xs">{currentLang.code.toUpperCase()}</span>
+              <span className="hidden sm:block text-[11px] font-bold">{currentLang.code.toUpperCase()}</span>
               <svg className={`w-3 h-3 transition-transform hidden sm:block ${langOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
@@ -200,7 +241,7 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
                 {LANGUAGES.map(l => (
                   <button
                     key={l.code}
-                    onClick={() => { setLang(l.code); setLangOpen(false); }}
+                    onClick={() => changeLang(l.code)}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm transition-all ${
                       lang === l.code
                         ? 'bg-cyan-500/15 text-cyan-400'
@@ -216,65 +257,63 @@ export default function Navbar({ activePage = 'home' }: NavbarProps) {
             )}
           </div>
 
-          {/* Wallet connect */}
-          {walletAddr ? (
-            <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl border border-cyan-500/30 bg-cyan-500/10 text-sm font-mono text-cyan-400">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              {walletAddr.slice(0, 6)}...{walletAddr.slice(-4)}
-            </div>
-          ) : (
-            <button
-              onClick={connectWallet}
-              className="btn btn-primary px-4 py-2 rounded-xl text-sm font-bold hidden md:flex"
-            >
-              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              Connect Wallet
-            </button>
-          )}
+          {/* Wallet — uses WalletContext (direct app connect, not browser tab) */}
+          <div className="hidden md:block">
+            <WalletButton />
+          </div>
 
           {/* Mobile menu toggle */}
           <button
-            className="lg:hidden p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/[0.06] transition-all"
+            className="lg:hidden relative p-2 rounded-xl text-white bg-white/[0.04] border border-white/[0.08] hover:bg-cyan-500/10 hover:border-cyan-500/30 transition-all"
             onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Menu"
           >
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d={mobileOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'} />
-            </svg>
+            <div className="w-5 h-4 flex flex-col justify-between">
+              <span className={`block h-0.5 bg-current rounded-full transition-all duration-300 ${mobileOpen ? 'rotate-45 translate-y-[7px]' : ''}`} />
+              <span className={`block h-0.5 bg-current rounded-full transition-all duration-300 ${mobileOpen ? 'opacity-0' : ''}`} />
+              <span className={`block h-0.5 bg-current rounded-full transition-all duration-300 ${mobileOpen ? '-rotate-45 -translate-y-[7px]' : ''}`} />
+            </div>
           </button>
         </div>
       </div>
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="lg:hidden border-t border-white/[0.05] bg-[#020617]/98 px-4 py-4 flex flex-col gap-1">
-          {[
-            { label: '🏠 Home', href: '/' },
-            { label: '💰 Presale', href: '/#presale' },
-            { label: '🗳️ DAO', href: '/#dao' },
-            { label: '📄 Docs', href: '/#docs' },
-          ].map(item => (
-            <a key={item.label} href={item.href} className="px-4 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-white/[0.05] transition-all text-sm font-medium">
+        <div className="lg:hidden border-t border-white/[0.05] bg-[#020617]/98 px-4 py-4 flex flex-col gap-1.5">
+          {navItems.map(item => (
+            <Link
+              key={item.key}
+              href={item.href}
+              onClick={() => setMobileOpen(false)}
+              className={`px-4 py-3 rounded-xl flex items-center gap-3 transition-all text-sm font-semibold ${
+                activePage === item.key ? 'bg-white/[0.08] text-white' : 'text-gray-300 hover:text-white hover:bg-white/[0.05]'
+              }`}
+            >
+              <span className="text-base opacity-70">{item.icon}</span>
               {item.label}
-            </a>
+            </Link>
           ))}
 
-          <div className="border-t border-white/[0.05] mt-2 pt-2">
-            <a href="/lsc" className="px-4 py-3 rounded-xl flex items-center gap-2 text-amber-400 hover:bg-amber-500/10 transition-all text-sm font-bold">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-              ⬡ LSC Chain Dashboard
-              <span className="ml-auto text-[10px] bg-amber-500 text-black px-1.5 py-0.5 rounded-full font-bold">2027</span>
-            </a>
-          </div>
+          <Link href="/lsc" onClick={() => setMobileOpen(false)} className="px-4 py-3 rounded-xl flex items-center gap-3 text-amber-400 hover:bg-amber-500/10 transition-all text-sm font-bold">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            ⬡ LSC Chain Dashboard
+            <span className="ml-auto text-[10px] bg-amber-500 text-black px-1.5 py-0.5 rounded-full font-bold">2027</span>
+          </Link>
 
-          <div className="border-t border-white/[0.05] mt-2 pt-3">
+          <div className="border-t border-white/[0.05] mt-2 pt-3 space-y-2">
+            <Link href="/presale" onClick={() => setMobileOpen(false)}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg shadow-emerald-500/30">
+              💰 Buy AIDAG — $0.078
+            </Link>
+            <Link href="/dao" onClick={() => setMobileOpen(false)}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold border border-purple-500/30 text-purple-300 bg-purple-500/10 hover:bg-purple-500/20">
+              ⬢ Become DAO Member
+            </Link>
             <button
-              onClick={connectWallet}
+              onClick={() => { setMobileOpen(false); openModal(); }}
               className="btn btn-primary w-full py-3 rounded-xl text-sm font-bold"
             >
-              Connect Wallet
+              {isConnected ? 'Wallet Connected' : 'Connect Wallet'}
             </button>
           </div>
         </div>
