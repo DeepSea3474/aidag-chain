@@ -9,8 +9,12 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.29.2",
+    "@react-three/drei": "^9.122.0",
+    "@react-three/fiber": "^8.18.0",
+    "@react-three/postprocessing": "^2.19.1",
     "@reown/appkit": "^1.8.19",
     "@tailwindcss/postcss": "^4.2.2",
+    "@types/three": "^0.170.0",
     "autoprefixer": "^10.4.27",
     "ethers": "^6.16.0",
     "i18next": "^26.0.4",
@@ -20,7 +24,8 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-i18next": "^17.0.2",
-    "tailwindcss": "^4.2.2"
+    "tailwindcss": "^4.2.2",
+    "three": "^0.170.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260421.1",
