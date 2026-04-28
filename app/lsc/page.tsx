@@ -104,7 +104,7 @@ const MILESTONES: Milestone[] = [
 ];
 
 const AI_MODULES = [
-  { name: 'Consensus Engine', version: 'v0.3.1', status: 'running', lang: 'Rust', progress: 34 },
+  { name: 'Consensus Engine', version: 'v0.3.1', status: 'running', lang: 'Rust', progress: 100 },
   { name: 'DAG Validator', version: 'v0.2.8', status: 'running', lang: 'Go', progress: 28 },
   { name: 'Quantum Crypto Layer', version: 'v0.1.4', status: 'running', lang: 'Rust', progress: 18 },
   { name: 'SoulwareAI Governor', version: 'v2.1.0', status: 'running', lang: 'Python', progress: 67 },
