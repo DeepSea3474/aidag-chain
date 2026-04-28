@@ -1,3 +1,4 @@
+"use client";
 import './globals.css';
 import { WalletProvider } from '../lib/WalletContext';
 import { LanguageProvider } from '../lib/LanguageContext';

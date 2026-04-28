@@ -1,4 +1,5 @@
 "use client";
+"use client";
 
 import React, { useState } from 'react';
 import { WagmiConfig, createConfig, mainnet } from 'wagmi';
